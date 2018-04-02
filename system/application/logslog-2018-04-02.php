@@ -65,3 +65,19 @@ ERROR - 2018-04-02 18:54:19 --> Severity: Error --> Call to undefined method Api
 ERROR - 2018-04-02 19:15:58 --> Severity: Notice --> Undefined variable: bfp_id D:\localhost\eds-www\devil_time\application\controllers\Api.php 267
 ERROR - 2018-04-02 19:15:58 --> Severity: Notice --> Undefined offset: 0 D:\localhost\eds-www\devil_time\application\controllers\Api.php 267
 ERROR - 2018-04-02 19:15:58 --> Query error: Column 'user_id' cannot be null - Invalid query: INSERT INTO `user_ip_address` (`user_id`, `ip_id`) VALUES (NULL, 8)
+ERROR - 2018-04-02 19:40:11 --> Severity: Notice --> Undefined variable: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 519
+ERROR - 2018-04-02 19:40:11 --> Severity: Notice --> Trying to get property of non-object D:\localhost\eds-www\devil_time\application\controllers\Api.php 519
+ERROR - 2018-04-02 19:41:08 --> Severity: Notice --> Undefined variable: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 519
+ERROR - 2018-04-02 19:46:42 --> Severity: Warning --> preg_match(): Unknown modifier '[' D:\localhost\eds-www\devil_time\application\controllers\Api.php 521
+ERROR - 2018-04-02 19:47:01 --> Severity: Warning --> preg_match(): Unknown modifier '.' D:\localhost\eds-www\devil_time\application\controllers\Api.php 521
+ERROR - 2018-04-02 19:48:16 --> Severity: Warning --> preg_match(): Unknown modifier '{' D:\localhost\eds-www\devil_time\application\controllers\Api.php 521
+ERROR - 2018-04-02 19:48:41 --> Severity: Warning --> preg_match(): No ending delimiter '^' found D:\localhost\eds-www\devil_time\application\controllers\Api.php 521
+ERROR - 2018-04-02 19:50:13 --> Severity: Warning --> preg_match(): Unknown modifier '{' D:\localhost\eds-www\devil_time\application\controllers\Api.php 521
+ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 520
+ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Trying to get property of non-object D:\localhost\eds-www\devil_time\application\controllers\Api.php 520
+ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 525
+ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Trying to get property of non-object D:\localhost\eds-www\devil_time\application\controllers\Api.php 525
+ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 529
+ERROR - 2018-04-02 19:53:27 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 531
+ERROR - 2018-04-02 19:53:35 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 531
+ERROR - 2018-04-02 19:53:56 --> 404 Page Not Found: Api/update_footprint

@@ -462,7 +462,7 @@
               this.loadPostOffset = this.loadPostOffset + 10;
               this.loadingMore = true;
 
-              var getPosts = axios.get('/dt/api/posts/GET/' {
+              var getPosts = axios.get('/dt/api/posts/GET/', {
                 limit: 10,
                 offset: this.loadPostOffset,
               })
