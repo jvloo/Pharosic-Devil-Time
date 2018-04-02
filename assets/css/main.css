@@ -1,0 +1,231 @@
+body, html {
+  width: 100%;
+  height: 100%;
+  padding-right: 8px
+}
+
+.side.content {
+  height: 100vh;
+  background-image: url('../img/side-ads/1.jpg');
+  background-color: #CFD6E9;
+  display: flex ! important;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.side.content .header, .side.content .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 15px;
+  color: #FAFBFC;
+}
+.side.content .footer {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.side.content .search.input {
+  color: #FAFBFC;
+  text-align: right;
+}
+.side.content .search.icon {
+  color: #FAFBFC;
+}
+
+.side.content .identity.select {
+   display: flex !important;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   padding: 20px 30px;
+}
+.side.content .identity.select .button {
+   background-color: rgba(250, 251, 252, 0.7);
+}
+.side.content .identity.select .identity-name {
+   margin-top: 15px;
+   font-size: 25px;
+   color: #FAFBFC;
+}
+.side.content .identity.select .preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.side.content .identity.select .loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+}
+
+.side.content .mood.select {
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   align-items: center;
+   color: #FAFBFC;
+}
+.side.content .mood.select label {
+   font-size: 18px;
+   margin-right: 10px;
+}
+.side.content .mood.select select {
+  font-size: 18px;
+  padding: 0px 10px;
+}
+.side.content .mood.select option {
+  font-size: 18px;
+}
+
+.side.content .post.create {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+.side.content .footer .copyright {
+   font-size: 11px;
+}
+
+.main.content {
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3);
+  padding: 40px 80px !important;
+}
+
+.main.content .menu .item {
+  padding: 10px 5px !important;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
+}
+.main.content .menu .item:first-child {
+  padding: 10px 5px !important;
+  margin-left: 0px !important;
+  margin-right: 5px !important;
+}
+
+.main.content .right.menu .item {
+   color: #1E70BF;
+   margin-bottom: -10px;
+}
+.main.content .right.menu .item span {
+  margin-right: 10px;
+}
+
+.main.content .loader {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   height: 100%;
+}
+
+article {
+ margin: 30px 0px !important;
+ background: #FAFBFC !important;
+ border: 0.5px solid #f2f3f4 !important;
+ box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2) !important;
+ transition: transform .2s;
+ word-wrap: break-word;
+ text-align: justify;
+}
+article:hover {
+  transform: scale(1.015);
+}
+
+article .article.content {
+   border: none !important;
+   padding: 20px 30px 20px 10px !important;
+}
+article .article.content span {
+   color: #2775C1;
+   font-size: 15px;
+}
+article .article.content span.in {
+  color: #A8A9AA;
+}
+article .article.content span.quote {
+  color: #696A6A;
+  margin: 0px 5px;
+}
+article .article.content .description {
+   font-size: 18px;
+   text-align: justify;
+   text-justify: auto;
+   padding: 5px 0px 0px 45px;
+}
+
+article .action.content {
+   font-size: 15px !important;
+   color: #2775C1;
+   border: none !important;
+   padding-left: 20px !important;
+   padding-right: 30px !important;
+}
+article .action.content .like i {
+  transition: transform 1s;
+}
+article .action.content .like:hover i {
+  transform: scale(1.2);
+  color: #FF2733;
+}
+article .action.content .like:hover i.active {
+  transform: scale(1.2);
+  color: #adadad !important;
+}
+article .action.content .share i {
+  margin-left: 10px;
+}
+
+article .extra.content .like i {
+  transition: transform 1s;
+}
+article .extra.content .like:hover i {
+  transform: scale(1.2);
+  color: #FF2733;
+}
+article .extra.content .like:hover i.active {
+  transform: scale(1.2);
+  color: #adadad !important;
+}
+
+.fadeIn-transition {
+-webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+   -moz-animation: fadein 2s; /* Firefox < 16 */
+    -ms-animation: fadein 2s; /* Internet Explorer */
+     -o-animation: fadein 2s; /* Opera < 12.1 */
+        animation: fadein 2s;
+}
+
+@keyframes fadein {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
