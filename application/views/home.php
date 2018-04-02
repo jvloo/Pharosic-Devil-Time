@@ -413,12 +413,12 @@
               if( this.errors.length > 0) {
                 alert(this.errors.join(' '));
               } else {
-                this.$http.post('/dt/index.php/home/create_post', {
-                  author: this.identityMood + ' ' + this.identityLabel,
+                this.$http.post('/dt/api/posts/POST/', {
+                  author_name: this.identityMood + ' ' + this.identityLabel,
+                  author_avatar: this.avatarSelected.filename,
                   description: this.description,
                   source: this.source,
-                  category: this.category,
-                  avatar: this.avatarSelected.filename,
+                  // quote_id: this.quote_id,
                   user_id: this.user.id,
                 })
                   .then(function(response){
@@ -462,7 +462,10 @@
               this.loadPostOffset = this.loadPostOffset + 10;
               this.loadingMore = true;
 
-              var getPosts = axios.get('/dt/index.php/home/get_posts/' + this.loadPostOffset)
+              var getPosts = axios.get('/dt/api/posts/GET/' {
+                limit: 10,
+                offset: this.loadPostOffset,
+              })
                 .then( (result) => {
                   for (var i = 0, len = result.data.length; i < len; i++) {
                     this.posts.push(result.data[i]);
@@ -484,7 +487,7 @@
 
             setTimeout(function() {
               new Fingerprint2().get(function(hash, components) {
-                self.$http.post('/dt/index.php/home/check_footprint', {
+                self.$http.post('/dt/api/user/GET/', {
                   bfp_hash: hash,
                   bfp_components: components
                 })
@@ -542,7 +545,10 @@
                 console.error(error);
               });
 
-            var getPosts = axios.get('/dt/index.php/home/get_posts')
+            var getPosts = axios.get('/dt/api/posts/get/',
+            {
+              limit: 20,
+            })
               .then(function(result){
                 self.posts = result.data;
                 self.postLoading = false;
