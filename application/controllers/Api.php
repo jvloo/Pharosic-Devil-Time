@@ -21,7 +21,7 @@ class Api extends CI_Controller {
 		print_r( json_encode($response) );
 	}
 
-	public function posts( $method = '' ) {
+	public function post( $method = '' ) {
 
 		if( $method === 'GET' ) {
 
@@ -342,6 +342,77 @@ class Api extends CI_Controller {
 
 			print_r( json_encode($output) );
 		}
+	}
+
+	public function option( $method = '' ) {
+
+		if( $method === 'GET' ) {
+
+			if( ! empty( $this->uri->segment(2) ) ) {
+
+				switch( $this->uri->segment(2) ) {
+					case 'mood':
+						$moods = $this->get_all('mood');
+						$response = array(
+							'status'	=> '200',
+							'code'		=> 'OK',
+							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+							'body'	=> $moods,
+						);
+						break;
+
+					case 'avatar':
+						$avatars = $this->get_all('avatar');
+						$response = array(
+							'status'	=> '200',
+							'code'		=> 'OK',
+							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+							'body'	=> $avatars,
+						);
+						break;
+
+					case 'source':
+						$sources = $this->get_all('source');
+						$response = array(
+							'status'	=> '200',
+							'code'		=> 'OK',
+							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+							'body'	=> $sources,
+						);
+						break;
+
+					default:
+						$response = array(
+							'status'	=> '400',
+							'code'		=> 'InvalidQueryParameterValue',
+							'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+						);
+						break;
+				}
+
+				print_r( json_encode($response) );
+
+			} else {
+
+				$response = array(
+					'status'	=> '400',
+					'code'		=> 'InvalidQueryParameterValue',
+					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+				);
+
+				print_r( json_encode($response) );
+			}
+
+		} else {
+			$output = array(
+				'status'	=> '400',
+				'code'		=> 'ConditionHeadersNotSupported',
+				'message'	=>	'Condition headers are not supported.',
+			);
+
+			print_r( json_encode($output) );
+		}
+
 	}
 
 	// CHECK: Check if $object with $value exists in $table.

@@ -413,7 +413,7 @@
               if( this.errors.length > 0) {
                 alert(this.errors.join(' '));
               } else {
-                this.$http.post('/dt/api/posts/POST/', {
+                this.$http.post('/dt/api/post/POST/', {
                   author_name: this.identityMood + ' ' + this.identityLabel,
                   author_avatar: this.avatarSelected.filename,
                   description: this.description,
@@ -462,7 +462,7 @@
               this.loadPostOffset = this.loadPostOffset + 10;
               this.loadingMore = true;
 
-              var getPosts = axios.get('/dt/api/posts/GET/', {
+              var getPosts = axios.get('/dt/api/post/GET/', {
                 limit: 10,
                 offset: this.loadPostOffset,
               })
@@ -517,7 +517,7 @@
             var self = this
 
           //----- Side Content -----//
-            var getMoods = axios.get('/dt/index.php/home/get_options/mood')
+            var getMoods = axios.get('/dt/api/option/GET/mood')
               .then(function(result){
                 self.moods = result.data;
                 self.moodLoading = false;
@@ -530,7 +530,7 @@
                 console.error(error);
               });
 
-            var getAvatars = axios.get('/dt/index.php/home/get_options/avatar')
+            var getAvatars = axios.get('/dt/api/option/GET/avatar')
               .then(function(result){
                 self.avatars = result.data;
 
@@ -545,7 +545,7 @@
                 console.error(error);
               });
 
-            var getPosts = axios.get('/dt/api/posts/get/',
+            var getPosts = axios.get('/dt/api/post/GET/',
             {
               limit: 20,
             })
@@ -567,15 +567,16 @@
           //----- Main Content -----//
 
           //----- Post Modal -----//
-            var getCategories = axios.get('/dt/index.php/home/get_options/category')
+          /*  var getCategories = axios.get('/dt/index.php/home/get_options/category')
               .then(function(result){
                 self.categories = result.data;
               })
               .catch(function(error){
                 console.error(error);
               });
+          */
 
-            var getSources = axios.get('/dt/index.php/home/get_options/source')
+            var getSources = axios.get('/dt/api/option/GET/source')
               .then(function(result){
                 self.sources = result.data;
               })
