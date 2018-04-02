@@ -1,1 +1,0 @@
-# Pharosic Devil Time
