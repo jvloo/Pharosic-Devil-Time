@@ -83,3 +83,80 @@ ERROR - 2018-04-02 19:53:35 --> Severity: Notice --> Undefined index: uid D:\loc
 ERROR - 2018-04-02 19:53:56 --> 404 Page Not Found: Api/update_footprint
 ERROR - 2018-04-02 20:30:36 --> Severity: Error --> Maximum execution time of 30 seconds exceeded D:\localhost\eds-www\devil_time\system\database\drivers\mysqli\mysqli_driver.php 202
 ERROR - 2018-04-02 20:57:34 --> Severity: Parsing Error --> syntax error, unexpected ';', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 389
+ERROR - 2018-04-02 21:02:15 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (1, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (1, '4')
+ERROR - 2018-04-02 21:06:05 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (2, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (2, '4')
+ERROR - 2018-04-02 21:06:41 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (3, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (3, '4')
+ERROR - 2018-04-02 21:08:10 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:08:11 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:09:16 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:09:17 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:09:20 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:09:22 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:10:19 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:10:20 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:10:22 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:10:23 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:13:22 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:13:51 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:14:07 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:14:26 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:16:24 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:17:10 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:17:26 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:18:00 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:19:43 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:19:54 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:20:08 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:22:32 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:23:07 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:24:18 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:24:49 --> 404 Page Not Found: Undefined/index
+ERROR - 2018-04-02 21:25:20 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (4, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (4, '4')
+ERROR - 2018-04-02 21:27:37 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (5, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (5, '4')
+ERROR - 2018-04-02 21:30:00 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (6, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (6, '4')
+ERROR - 2018-04-02 21:30:07 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (7, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (7, '4')
+ERROR - 2018-04-02 21:31:38 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (8, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (8, '4')
+ERROR - 2018-04-02 21:34:00 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (9, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (9, '4')
+ERROR - 2018-04-02 21:36:48 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (10, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (10, '4')
+ERROR - 2018-04-02 21:38:49 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0, 1) VALUES (11, '4')' at line 1 - Invalid query: INSERT INTO `post_user` (0, 1) VALUES (11, '4')
+ERROR - 2018-04-02 21:39:39 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:39:39 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:39:39 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:39:39 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:39:39 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:39:42 --> Severity: Parsing Error --> syntax error, unexpected '=', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 91
+ERROR - 2018-04-02 21:44:17 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:44:17 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:44:17', '2018-04-02 21:44:17')
+ERROR - 2018-04-02 21:51:37 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:51:37 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:51:37', '2018-04-02 21:51:37')
+ERROR - 2018-04-02 21:53:09 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:53:09 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:53:09', '2018-04-02 21:53:09')
+ERROR - 2018-04-02 21:55:02 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:55:02 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:55:02', '2018-04-02 21:55:02')
+ERROR - 2018-04-02 21:56:07 --> Severity: Notice --> Trying to get property of non-object D:\localhost\eds-www\devil_time\application\controllers\Api.php 613
+ERROR - 2018-04-02 21:56:47 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:56:47 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:56:47', '2018-04-02 21:56:47')
+ERROR - 2018-04-02 21:58:21 --> Severity: Notice --> Trying to get property of non-object D:\localhost\eds-www\devil_time\application\controllers\Api.php 615
+ERROR - 2018-04-02 21:59:26 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 21:59:26 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 21:59:26', '2018-04-02 21:59:26')
+ERROR - 2018-04-02 22:02:25 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:02:25 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:02:25 --> Query error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '0) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, Array)' at line 1 - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, 0) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, Array)
+ERROR - 2018-04-02 22:04:09 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:04:09 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 22:04:09', '2018-04-02 22:04:09')
+ERROR - 2018-04-02 22:04:50 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:04:50 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array)
+ERROR - 2018-04-02 22:07:21 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:07:21 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array)
+ERROR - 2018-04-02 22:09:15 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:09:15 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array)
+ERROR - 2018-04-02 22:10:48 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:10:48 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array)
+ERROR - 2018-04-02 22:13:28 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:13:28 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 22:13:28', '2018-04-02 22:13:28')
+ERROR - 2018-04-02 22:13:28 --> Severity: Warning --> Cannot modify header information - headers already sent by (output started at D:\localhost\eds-www\devil_time\application\controllers\Api.php:139) D:\localhost\eds-www\devil_time\system\core\Common.php 570
+ERROR - 2018-04-02 22:14:24 --> Severity: Notice --> Array to string conversion D:\localhost\eds-www\devil_time\system\database\DB_driver.php 1477
+ERROR - 2018-04-02 22:14:24 --> Query error: Unknown column 'Array' in 'field list' - Invalid query: INSERT INTO `bfp_hash` (`bfp_hash`, `components`, `last_visit`, `created_on`) VALUES ('c6b2eac2ff71ab7cf32a3c18b8caebb7', Array, '2018-04-02 22:14:24', '2018-04-02 22:14:24')
+ERROR - 2018-04-02 22:14:24 --> Severity: Warning --> Cannot modify header information - headers already sent by (output started at D:\localhost\eds-www\devil_time\application\controllers\Api.php:139) D:\localhost\eds-www\devil_time\system\core\Common.php 570
+ERROR - 2018-04-02 22:22:09 --> 404 Page Not Found: Api/posts
+ERROR - 2018-04-02 22:22:13 --> 404 Page Not Found: Api/posts

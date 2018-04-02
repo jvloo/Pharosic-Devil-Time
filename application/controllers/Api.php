@@ -40,17 +40,19 @@ class Api extends CI_Controller {
 				$table = 'post';
 				$query = 'SELECT * FROM ' . $table;
 
-				if( ! empty($this->input->get('limit')) ) {
-					$limit = $this->input->get('limit');
+				if( ! empty($this->uri->segment(5)) ) {
+					$limit = $this->uri->segment(5);
 					$query = $query . ' LIMIT ' . $limit;
 				}
 
-				if( ! empty($this->input->get('offset')) ) {
-					$offset = $this->input->get('offset');
+				if( ! empty($this->uri->segment(7)) ) {
+					$offset = $this->uri->segment(7);
 					$query = $query . ' OFFSET ' . $offset;
 				}
 
 				$result = $this->db->query($query)->result_array();
+
+
 				$response = array(
 					'status'	=> '200',
 					'code'		=> 'OK',
@@ -58,7 +60,12 @@ class Api extends CI_Controller {
 					'body'	=> $result,
 				);
 
+				$response['total_entries'] = $this->db->count_all('post');
+
+
 				print_r( json_encode($response) );
+
+				// TODO: post_count && last_post
 			}
 
 		} elseif( $method === 'POST' ) {
@@ -86,11 +93,10 @@ class Api extends CI_Controller {
 
 				$this->db->insert('post', $input);
 
-				unset($input);
 
 				$input = array(
-					$post_id = $this->db->insert_id(),
-					$user_id = $user_id,
+					'post_id' => $this->db->insert_id(),
+					'user_id' => $user_id,
 				);
 
 				$this->db->insert('post_user', $input);
@@ -133,7 +139,7 @@ class Api extends CI_Controller {
 			$error = false;
 
 			$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
-			$bfp_components = ! empty($this->input->post('bfp_components')) ? $this->input->post('bfp_components') : $error = true;
+			$bfp_components = ! empty($this->input->post('bfp_components')) ? json_encode($this->input->post('bfp_components')) : $error = true;
 
 			$ip_address = file_get_contents('https://api.ipify.org/');
 			$ip_components = file_get_contents('http://ip-api.com/json');
@@ -605,6 +611,25 @@ class Api extends CI_Controller {
 		}
 
 	}
+
+	public function update_post_count( $uid = '') {
+
+		$curr_date = date('Y-m-d');
+		$last_post = $this->get_by('id', $uid, 'user')->last_post;
+
+		$input['last_post']	= $curr_date;
+
+		if( $last_post === $curr_date ) {
+			$post_count = $this->get_by('id', $uid, 'user')->post_count;
+			$input['post_count'] = $post_count + 1;
+		} else {
+			$input['post_count'] = 0;
+		}
+
+		$this->db->where('id', $uid)
+						 ->update('user', $input);
+	}
+
 	// Delete.
 
 		/*

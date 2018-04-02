@@ -109,13 +109,13 @@
                     <article class="ui fluid card" v-for="post in posts">
                       <div class="article content">
                         <span class="meta">
-                          <img class="ui mini spaced image" :src="post.avatar">
-                          <span class="author">{{ post.author }}</span>
+                          <img class="ui mini spaced image" :src="post.author_avatar">
+                          <span class="author">{{ post.author_name }}</span>
                           <span class="post-id">
-                            <a :href="post.postID">#{{ post.id }}</a>
+                            <a :href="post.id">#{{ post.id }}</a>
                           </span>
-                          <span class="in" v-if="post.source !== ''">from</span>
-                          <span class="category" v-if="post.source !== ''">
+                          <span class="in" v-if="post.source !== null">from</span>
+                          <span class="category" v-if="post.source !== null">
                             <a href="#">{{ post.source }}</a>
                           </span>
                         </span>
@@ -125,11 +125,11 @@
                         <div class="description">
                           <i>
                             <span class="post-id" v-show="false">
-                              <a :href="post.postID">#{{ post.id }}</a>
+                              <a :href="post.id">#{{ post.id }}</a>
                             </span>
                             <span class="quote" v-show="false">in reply to</span>
                             <span class="quote-id" v-show="false">
-                              <a :href="post.quoteID">#</a>
+                              <a :href="post.quote_id">#</a>
                             </span>
                           </i>
                           <div class="text">{{ post.description }}</div>
@@ -320,6 +320,7 @@
             postNoContent: false,
 
             posts: [],
+            total_entries: [],
 
             loadPostOffset: 0,
             loadingMore: false,
@@ -458,13 +459,13 @@
               }, 1000);
             },
             loadMore: function () {
+              if( this.totalEntries < 20 ) {
+                // TODO:
+              }
               this.loadPostOffset = this.loadPostOffset + 10;
               this.loadingMore = true;
 
-              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/', {
-                limit: 10,
-                offset: this.loadPostOffset,
-              })
+              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/10/offset/' + this.loadPostOffset)
                 .then( (result) => {
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
@@ -520,9 +521,9 @@
                 self.moods = result.data.body;
                 self.moodLoading = false;
 
-                var moodRandom = Math.floor( Math.random() * result.data.length );
-                self.identityMood = result.data[moodRandom].value;
-                self.moodSelected = result.data[moodRandom].value;
+                var moodRandom = Math.floor( Math.random() * result.data.body.length );
+                self.identityMood = result.data.body[moodRandom].value;
+                self.moodSelected = result.data.body[moodRandom].value;
               })
               .catch(function(error){
                 console.error(error);
@@ -532,9 +533,11 @@
               .then(function(result){
                 self.avatars = result.data.body;
 
-                var avatarRandom = Math.floor( Math.random() * result.data.length );
-                self.identityLabel = result.data[avatarRandom].label;
-                self.avatarSelected = result.data[avatarRandom];
+                var avatarRandom = Math.floor( Math.random() * result.data.body.length );
+                self.identityLabel = result.data.body[avatarRandom].label;
+                self.avatarSelected = result.data.body[avatarRandom];
+
+
                 self.avatarIndex= avatarRandom;
 
                 self.prevLoading = false;
@@ -543,13 +546,11 @@
                 console.error(error);
               });
 
-            var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/',
-            {
-              limit: 20,
-            })
+            var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/0')
               .then(function(result){
                 self.posts = result.data.body;
                 self.postLoading = false;
+                self.totalEntries = result.data.total_entries;
 
                 if(self.posts.length === 0) {
                   self.postNoContent = true;
