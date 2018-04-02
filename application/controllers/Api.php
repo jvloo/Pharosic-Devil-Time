@@ -126,14 +126,14 @@ class Api extends CI_Controller {
 		}
 	}
 
-	public function user( $method = '' ) {
+	public function user( $method = '', $hash = '', $components = [] ) {
 
 		if( $method === 'GET' ) {
 
 			$error = false;
 
-			$bfp_hash = ! empty($this->input->get('bfp_hash')) ? $this->input->get('bfp_hash') : $error = true;
-			$bfp_components = ! empty($this->input->get('bfp_components')) ? $this->input->get('bfp_components') : $error = true;
+			$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
+			$bfp_components = ! empty($this->input->post('bfp_components')) ? $this->input->post('bfp_components') : $error = true;
 
 			$ip_address = file_get_contents('https://api.ipify.org/');
 			$ip_components = file_get_contents('http://ip-api.com/json');
@@ -348,9 +348,9 @@ class Api extends CI_Controller {
 
 		if( $method === 'GET' ) {
 
-			if( ! empty( $this->uri->segment(2) ) ) {
+			if( ! empty( $this->uri->segment(4) ) ) {
 
-				switch( $this->uri->segment(2) ) {
+				switch( $this->uri->segment(4) ) {
 					case 'mood':
 						$moods = $this->get_all('mood');
 						$response = array(

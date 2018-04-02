@@ -81,3 +81,5 @@ ERROR - 2018-04-02 19:52:55 --> Severity: Notice --> Undefined index: uid D:\loc
 ERROR - 2018-04-02 19:53:27 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 531
 ERROR - 2018-04-02 19:53:35 --> Severity: Notice --> Undefined index: uid D:\localhost\eds-www\devil_time\application\controllers\Api.php 531
 ERROR - 2018-04-02 19:53:56 --> 404 Page Not Found: Api/update_footprint
+ERROR - 2018-04-02 20:30:36 --> Severity: Error --> Maximum execution time of 30 seconds exceeded D:\localhost\eds-www\devil_time\system\database\drivers\mysqli\mysqli_driver.php 202
+ERROR - 2018-04-02 20:57:34 --> Severity: Parsing Error --> syntax error, unexpected ';', expecting ')' D:\localhost\eds-www\devil_time\application\controllers\Api.php 389

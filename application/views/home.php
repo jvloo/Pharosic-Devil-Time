@@ -413,7 +413,7 @@
               if( this.errors.length > 0) {
                 alert(this.errors.join(' '));
               } else {
-                this.$http.post('/dt/api/post/POST/', {
+                this.$http.post('<?php echo site_url(); ?>/api/post/POST/', {
                   author_name: this.identityMood + ' ' + this.identityLabel,
                   author_avatar: this.avatarSelected.filename,
                   description: this.description,
@@ -423,7 +423,6 @@
                 })
                   .then(function(response){
                     alert('Your confession #post-id has been posted.')
-                    console.log(response)
                     event.target.reset()
                     this.description = ''
                     this.source = ''
@@ -462,13 +461,13 @@
               this.loadPostOffset = this.loadPostOffset + 10;
               this.loadingMore = true;
 
-              var getPosts = axios.get('/dt/api/post/GET/', {
+              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/', {
                 limit: 10,
                 offset: this.loadPostOffset,
               })
                 .then( (result) => {
-                  for (var i = 0, len = result.data.length; i < len; i++) {
-                    this.posts.push(result.data[i]);
+                  for (var i = 0, len = result.data.body.length; i < len; i++) {
+                    this.posts.push(result.data.body[i]);
                     this.loadingMore = false;
                   }
                 })
@@ -487,13 +486,12 @@
 
             setTimeout(function() {
               new Fingerprint2().get(function(hash, components) {
-                self.$http.post('/dt/api/user/GET/', {
+                self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
                   bfp_hash: hash,
                   bfp_components: components
                 })
                   .then(function(response){
-                    console.log(response)
-                    self.user = response.data[0]
+                    self.user = response.data.body
                     self.modalLoading = false
 
                     if( self.user.post_count >= 3 ) {
@@ -517,9 +515,9 @@
             var self = this
 
           //----- Side Content -----//
-            var getMoods = axios.get('/dt/api/option/GET/mood')
+            var getMoods = axios.get('<?php echo site_url(); ?>/api/option/GET/mood')
               .then(function(result){
-                self.moods = result.data;
+                self.moods = result.data.body;
                 self.moodLoading = false;
 
                 var moodRandom = Math.floor( Math.random() * result.data.length );
@@ -530,9 +528,9 @@
                 console.error(error);
               });
 
-            var getAvatars = axios.get('/dt/api/option/GET/avatar')
+            var getAvatars = axios.get('<?php echo site_url(); ?>/api/option/GET/avatar')
               .then(function(result){
-                self.avatars = result.data;
+                self.avatars = result.data.body;
 
                 var avatarRandom = Math.floor( Math.random() * result.data.length );
                 self.identityLabel = result.data[avatarRandom].label;
@@ -545,12 +543,12 @@
                 console.error(error);
               });
 
-            var getPosts = axios.get('/dt/api/post/GET/',
+            var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/',
             {
               limit: 20,
             })
               .then(function(result){
-                self.posts = result.data;
+                self.posts = result.data.body;
                 self.postLoading = false;
 
                 if(self.posts.length === 0) {
@@ -558,7 +556,6 @@
                 } else {
                   self.postNoContent = false;
                 }
-                console.log(result.data);
               })
               .catch(function(error){
                 console.error(error);
@@ -576,9 +573,9 @@
               });
           */
 
-            var getSources = axios.get('/dt/api/option/GET/source')
+            var getSources = axios.get('<?php echo site_url(); ?>/api/option/GET/source')
               .then(function(result){
-                self.sources = result.data;
+                self.sources = result.data.body;
               })
               .catch(function(error){
                 console.error(error);
