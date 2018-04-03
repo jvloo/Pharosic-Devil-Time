@@ -141,11 +141,8 @@ class Api extends CI_Controller {
 		if( $method === 'GET') {
 
 			header("Access-Control-Allow-Methods: GET");
-<<<<<<< HEAD
 
 			$error = false;
-=======
->>>>>>> 549ad353e1d28be550c7c29fee60d82b2a499696
 
 			if( $this->uri->segment(4) === 'hash' ){
 
@@ -198,12 +195,8 @@ class Api extends CI_Controller {
 		} else if( $method === 'POST' ) {
 
 			header("Access-Control-Allow-Methods: POST");
-<<<<<<< HEAD
 
 			$error = false;
-=======
->>>>>>> 549ad353e1d28be550c7c29fee60d82b2a499696
-
 
 			if( $this->uri->segment(4) === 'fb_connect' ){
 
