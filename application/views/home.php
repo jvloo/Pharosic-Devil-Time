@@ -264,24 +264,6 @@
     <script src="https://cdn.auth0.com/js/auth0/9.3.1/auth0.min.js"></script>
 
     <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '403552113156005',
-          cookie     : true,
-          xfbml      : true,
-          version    : 'v2.8'
-        });
-
-        FB.AppEvents.logPageView();
-      };
-
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "https://connect.facebook.net/en_US/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-       }(document, 'script', 'facebook-jssdk'));
 
       Vue.http.options.emulateJSON = true;
 
@@ -365,6 +347,51 @@
                   });
               })
             }, 3000)
+
+            window.fbAsyncInit = function() {
+              FB.init({
+                appId      : '403552113156005',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v2.8'
+              });
+
+              FB.AppEvents.logPageView();
+
+              FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                  // the user is logged in and has authenticated your
+                  // app, and response.authResponse supplies
+                  // the user's ID, a valid access token, a signed
+                  // request, and the time the access token
+                  // and signed request each expire
+                  var uid = response.authResponse.userID;
+                  var accessToken = response.authResponse.accessToken;
+
+                  console.log(response);
+
+                  FB.api('/me', {fields: 'age_range'}, function(response) {
+                    console.log(JSON.stringify(response));
+                  });
+                } else if (response.status === 'not_authorized') {
+                  // the user is logged in to Facebook,
+                  // but has not authenticated your app
+                  console.log('not authorized');
+                } else {
+                  // the user isn't logged in to Facebook.
+                  console.log('not logged in');
+
+                }
+              });
+            };
+
+            (function(d, s, id){
+               var js, fjs = d.getElementsByTagName(s)[0];
+               if (d.getElementById(id)) {return;}
+               js = d.createElement(s); js.id = id;
+               js.src = "https://connect.facebook.net/en_US/sdk.js";
+               fjs.parentNode.insertBefore(js, fjs);
+             }(document, 'script', 'facebook-jssdk'));
         },
         mounted: function () {
           //----- Global -----//
@@ -422,40 +449,21 @@
               });
         },
         methods: {
-
-          checkFBLoginStatus: function () {
-            FB.getLoginStatus(function(response) {
-              if (response.status === 'connected') {
-                // the user is logged in and has authenticated your
-                // app, and response.authResponse supplies
-                // the user's ID, a valid access token, a signed
-                // request, and the time the access token
-                // and signed request each expire
-                var uid = response.authResponse.userID;
-                var accessToken = response.authResponse.accessToken;
-
-                console.log(uid + accessToken);
-              } else if (response.status === 'not_authorized') {
-                // the user is logged in to Facebook,
-                // but has not authenticated your app
-              } else {
-                // the user isn't logged in to Facebook.
-              }
-            });
-          },
+          //----- FB Login Button -----//
             openFbLoginDialog: function () {
               FB.login(function(response) {
                   if (response.authResponse) {
                    console.log('Welcome!  Fetching your information.... ');
                    FB.api('/me', function(response) {
-                     console.log(response);
+                     console.log(JSON.stringify(response));
                    });
                   } else {
                    console.log('User cancelled login or did not fully authorize.');
                   }
               },{
-                scope: 'email, public_profile',
+                scope: 'public_profile, email',
                 return_scopes: true,
+                auth_type: 'rerequest'
               });
             },
           //----- Side Content -----//
