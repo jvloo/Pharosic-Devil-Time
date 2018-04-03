@@ -68,7 +68,7 @@ class Api extends CI_Controller {
 				// TODO: post_count && last_post
 			}
 
-		} elseif( $method === 'POST' ) {
+		} else if( $method === 'POST' ) {
 
 			$error = false;
 
@@ -137,6 +137,42 @@ class Api extends CI_Controller {
 	public function user( $method = '', $hash = '', $components = [] ) {
 
 		if( $method === 'GET' ) {
+
+			$error = false;
+
+			$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+
+			if( ! $error ) {
+				$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+
+				if( ! empty($bfp_id) ) {
+					$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+					$user = $this->get_by('id', $uid_by_bfp, 'user');
+				} else {
+					$user = [];
+				}
+
+				$response = array(
+					'status'	=> '200',
+					'code'		=> 'OK',
+					'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+					'body'	=> $user,
+				);
+
+				print_r( json_encode($response) );
+
+			} else {
+				$output = array(
+					'status'	=> '500',
+					'code'		=> 'InternalError',
+					'message'	=>	'The server encountered an internal error. Please retry the request.',
+					'body'		=>	'',
+				);
+
+				print_r( json_encode($output) );
+			}
+
+		} else if( $method === 'POST' ) {
 
 			$error = false;
 
@@ -225,7 +261,7 @@ class Api extends CI_Controller {
 					$this->update_footprint('all', $values);
 
 				// Either IP or BFP not exist.
-				} elseif( ! $exist_ip || ! $exist_bfp ) {
+				} else if( ! $exist_ip || ! $exist_bfp ) {
 
 					// Both IP & BFP not exist.
 					// Register visitor as new user.
@@ -265,7 +301,7 @@ class Api extends CI_Controller {
 
 					// Only BFP exists.
 					// Consider user changes IP address.
-					} elseif( ! $exist_ip && $exist_bfp ) {
+					} else if( ! $exist_ip && $exist_bfp ) {
 
 						// Mark new footprints.
 						$input = array(
@@ -335,6 +371,7 @@ class Api extends CI_Controller {
 					'status'	=> '500',
 					'code'		=> 'InternalError',
 					'message'	=>	'The server encountered an internal error. Please retry the request.',
+					'body'		=>	'',
 				);
 
 				print_r( json_encode($output) );
@@ -346,6 +383,7 @@ class Api extends CI_Controller {
 				'status'	=> '400',
 				'code'		=> 'ConditionHeadersNotSupported',
 				'message'	=>	'Condition headers are not supported.',
+				'body'		=>	'',
 			);
 
 			print_r( json_encode($output) );
@@ -394,6 +432,7 @@ class Api extends CI_Controller {
 							'status'	=> '400',
 							'code'		=> 'InvalidQueryParameterValue',
 							'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+							'body'		=>	'',
 						);
 						break;
 				}
@@ -406,6 +445,7 @@ class Api extends CI_Controller {
 					'status'	=> '400',
 					'code'		=> 'InvalidQueryParameterValue',
 					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+					'body'		=>	'',
 				);
 
 				print_r( json_encode($response) );
@@ -416,6 +456,7 @@ class Api extends CI_Controller {
 				'status'	=> '400',
 				'code'		=> 'ConditionHeadersNotSupported',
 				'message'	=>	'Condition headers are not supported.',
+				'body'		=>	'',
 			);
 
 			print_r( json_encode($output) );
@@ -567,7 +608,7 @@ class Api extends CI_Controller {
 
 			return $this->get_by('id', $uid, 'user');
 
-		} elseif( $table === 'bfp_hash' ) {
+		} else if( $table === 'bfp_hash' ) {
 			$input = array(
 				'user_id'	=>	$uid,
 				'bfp_id'		=>	$object,

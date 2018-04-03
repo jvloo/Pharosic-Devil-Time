@@ -93,7 +93,7 @@
                     <div class="right menu">
                       <div class="item">
                         <span>Login to comment</span>
-                        <a href="#" @click="openFbLoginDialog" scope="public_profile,email" onlogin="checkLoginState();"><i class="facebook big icon"></i></a>
+                        <a href="#" @click="fbLogin"><i class="facebook big icon"></i></a>
                         <a href="#"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
                       </div>
                     </div>
@@ -223,6 +223,7 @@
           </div>
           <div class="ui header" style="color: #FFFFFF; font-size: 15px; text-align: justify; padding: 10px 20px; margin-top: 20px">
             Share your story with us.
+            <span class="" style="float: right; cursor: pointer" @click="closePostModal"><i class="close icon"></i></span>
           </div>
           <div class="ui form" style="padding: 0px 20px">
             <div class="field">
@@ -324,27 +325,55 @@
 
             setTimeout(function() {
               new Fingerprint2().get(function(hash, components) {
-                self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
-                  bfp_hash: hash,
-                  bfp_components: components
-                })
+                // Fetch user.
+                self.$http.get('<?php echo site_url(); ?>/api/user/GET/hash/' + hash)
                   .then(function(response){
-                    self.user = response.data.body
-                    self.modalLoading = false
 
-                    if( self.user.post_count >= 3 ) {
-                      self.devilToken = 'You have no more devil token.';
-                    } else if( self.user.post_count == 2 ) {
-                      self.devilToken = 'You have 1 more devil token.';
-                    } else {
-                      self.devilToken = 'You have ' + (3 - self.user.post_count) + ' devil tokens.';
+                    // Fast track, if User exist, fetch user data first.
+                    if( response.data.body !== '') {
+                      self.user = response.data.body
+                      self.modalLoading = false
+
+                      if( self.user.post_count >= 3 ) {
+                        self.devilToken = 'You have no more devil token.';
+                      } else if( self.user.post_count == 2 ) {
+                        self.devilToken = 'You have 1 more devil token.';
+                      } else {
+                        self.devilToken = 'You have ' + (3 - self.user.post_count) + ' devil tokens.';
+                      }
+
+                      self.devilTokenCount = self.user.post_count;
                     }
 
-                    this.devilTokenCount = self.user.post_count;
+                    // Check user footprint.
+                    self.$http.post('<?php echo site_url(); ?>/api/user/POST/', {
+                      bfp_hash: hash,
+                      bfp_components: components
+                    })
+                      .then(function(response){
+                        self.user = response.data.body
+                        self.modalLoading = false
+
+                        if( self.user.post_count >= 3 ) {
+                          self.devilToken = 'You have no more devil token.';
+                        } else if( self.user.post_count == 2 ) {
+                          self.devilToken = 'You have 1 more devil token.';
+                        } else {
+                          self.devilToken = 'You have ' + (3 - self.user.post_count) + ' devil tokens.';
+                        }
+
+                        self.devilTokenCount = self.user.post_count;
+                      })
+                      .catch(function(error) {
+                        console.log(error)
+                      });
+
                   })
                   .catch(function(error){
                     console.log(error)
                   });
+
+
               })
             }, 3000)
 
@@ -368,11 +397,16 @@
                   var uid = response.authResponse.userID;
                   var accessToken = response.authResponse.accessToken;
 
-                  console.log(response);
-
-                  FB.api('/me', {fields: 'age_range'}, function(response) {
+                  FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
                     console.log(JSON.stringify(response));
                   });
+
+                  /*self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
+                    bfp_hash: hash,
+                    bfp_components: components
+                  })
+                    .then(function(response){ */
+
                 } else if (response.status === 'not_authorized') {
                   // the user is logged in to Facebook,
                   // but has not authenticated your app
@@ -450,11 +484,11 @@
         },
         methods: {
           //----- FB Login Button -----//
-            openFbLoginDialog: function () {
+            fbLogin: function () {
               FB.login(function(response) {
                   if (response.authResponse) {
                    console.log('Welcome!  Fetching your information.... ');
-                   FB.api('/me', function(response) {
+                   FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
                      console.log(JSON.stringify(response));
                    });
                   } else {
@@ -464,6 +498,12 @@
                 scope: 'public_profile, email',
                 return_scopes: true,
                 auth_type: 'rerequest'
+              });
+            },
+
+            fbLogout: function () {
+              FB.logout(function(response) {
+                console.log('logged out!');
               });
             },
           //----- Side Content -----//
