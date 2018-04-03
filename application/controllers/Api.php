@@ -8,6 +8,8 @@ class Api extends CI_Controller {
 		parent::__construct();
 		header("Access-Control-Allow-Origin: *");
 		header("Content-Type: application/json; charset=UTF-8");
+
+		date_default_timezone_set('Asia/Kuala_Lumpur');
 	}
 
 	public function index() {
@@ -804,11 +806,10 @@ class Api extends CI_Controller {
 
 	}
 
-	public function update_post_count( $uid = '') {
+	private function update_post_count( $uid = '') {
 
 		$curr_date = date('Y-m-d');
 		$last_post = $this->get_by('id', $uid, 'user')->last_post;
-
 		$input['last_post']	= $curr_date;
 
 		if( $last_post == $curr_date ) {

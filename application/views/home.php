@@ -127,7 +127,7 @@
                           </span>
                         </span>
                         <span class="right floated meta">
-                          <time :data-tooltip="post.createdOn">{{ timeAgo(post.createdOn) }}</time>
+                          <time :data-tooltip="post.createdOn">{{ timeAgo(post.created_on) }}</time>
                         </span>
                         <div class="description">
                           <i>
@@ -143,8 +143,8 @@
                         </div>
                       </div>
                       <div class="action content">
-                        <a class="like" @click="userLikedPost.includes(post.id) ? (userLikedPost.splice(userLikedPost.indexOf(post.id), 1), postUnliked(post)) : (userLikedPost.push(post.id), postLiked(post))">
-                          <i :class="{'heart like icon': true, active: userLikedPost.includes(post.id) }"  @click="userLikedPost.includes(post.id) ? userLikedPost.splice(userLikedPost.indexOf(post.id), 1) : userLikedPost.push(post.id)"></i>
+                        <a class="like" @click="fbLoggedIn ? ( userLikedPost.includes(post.id) ? ( userLikedPost.splice(userLikedPost.indexOf(post.id), 1), postUnliked(post) ) : ( userLikedPost.push(post.id), postLiked(post) ) ) : actionRequiredFb()">
+                          <i :class="{'heart like icon': true, active: userLikedPost.includes(post.id) && fbLoggedIn }"></i>
                             {{ post.likes }}
                             <span v-if="post.likes <= 1">
                               like
@@ -596,8 +596,6 @@
 
           //----- Side Content -----//
             moodChange: function () {
-              console.log(this.userLikedPost);
-
               this.identityMood = this.moodSelected;
             },
 
@@ -630,23 +628,58 @@
 
           //----- Main Content -----//
             timeAgo: function (dateTime) {
-              return timeago().format(dateTime); // BUG: Time seems not parsed.
+
+              return timeago().format(dateTime);
+            },
+
+            actionRequiredFb: function () {
+              alert('You need to connect with Facebook in order to perform the following action.');
             },
 
             postLiked: function(element) {
-              this.posts.forEach((e, i) => {
-                if (e.id == element.id) {
-                  this.posts[i].likes = Number(this.posts[i].likes) + 1;
-                }
-              });
+
+              if( this.fbLoggedIn) {
+
+                this.posts.forEach((e, i) => {
+                  if (e.id == element.id) {
+                    this.posts[i].likes = Number(this.posts[i].likes) + 1;
+                  }
+                });
+
+                self.$http.post('<?php echo site_url(); ?>/api/post/POST/action/like', {
+                  post_id: element.id,
+                  user_id: this.user.id,
+                })
+                  .then(function(response) {
+
+                  })
+                  .catch(function(error) {
+
+                  });
+              }
             },
 
             postUnliked: function(element) {
-              this.posts.forEach((e, i) => {
-                if (e.id == element.id) {
-                  this.posts[i].likes = Number(this.posts[i].likes) - 1;
-                }
-              });
+              if( this.fbLoggedIn) {
+
+                this.posts.forEach((e, i) => {
+                  if (e.id == element.id) {
+                    this.posts[i].likes = Number(this.posts[i].likes) - 1;
+                  }
+                });
+
+                self.$http.post('<?php echo site_url(); ?>/api/post/POST/action/unlike', {
+                  post_id: element.id,
+                  user_id: this.user.id,
+                })
+                  .then(function(response) {
+
+                  })
+                  .catch(function(error) {
+
+                  });
+              }
+
             },
 
           //----- Post Modal -----//
