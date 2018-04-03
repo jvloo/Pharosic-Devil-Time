@@ -320,10 +320,10 @@
             postNoContent: false,
 
             posts: [],
-            total_entries: [],
+            totalEntries: 0,
 
             loadPostOffset: 0,
-            loadingMore: false,
+            loadingMore: true,
 
           //----- Post Modal -----//
             postModal: false,
@@ -335,6 +335,91 @@
             description: textareaNotice,
             source: '',
 
+        },
+        beforeCreate: function () {
+          //----- Global -----//
+            var self = this;
+
+            setTimeout(function() {
+              new Fingerprint2().get(function(hash, components) {
+                self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
+                  bfp_hash: hash,
+                  bfp_components: components
+                })
+                  .then(function(response){
+                    self.user = response.data.body
+                    self.modalLoading = false
+
+                    if( self.user.post_count >= 3 ) {
+                      self.devilToken = 'You have no more devil token.';
+                    } else if( self.user.post_count == 2 ) {
+                      self.devilToken = 'You have 1 more devil token.';
+                    } else {
+                      self.devilToken = 'You have ' + (3 - self.user.post_count) + ' devil tokens.';
+                    }
+
+                    this.devilTokenCount = self.user.post_count;
+                  })
+                  .catch(function(error){
+                    console.log(error)
+                  });
+              })
+            }, 3000)
+        },
+        mounted: function () {
+          //----- Global -----//
+            var self = this
+
+          //----- Side Content -----//
+            var getMoods = axios.get('<?php echo site_url(); ?>/api/option/GET/mood')
+              .then(function(result){
+                self.moods = result.data.body;
+                self.moodLoading = false;
+
+                var moodRandom = Math.floor( Math.random() * result.data.body.length );
+                self.identityMood = result.data.body[moodRandom].value;
+                self.moodSelected = result.data.body[moodRandom].value;
+              })
+              .catch(function(error){
+                console.error(error);
+              });
+
+            var getAvatars = axios.get('<?php echo site_url(); ?>/api/option/GET/avatar')
+              .then(function(result){
+                self.avatars = result.data.body;
+
+                var avatarRandom = Math.floor( Math.random() * result.data.body.length );
+                self.identityLabel = result.data.body[avatarRandom].label;
+                self.avatarSelected = result.data.body[avatarRandom];
+
+
+                self.avatarIndex= avatarRandom;
+
+                self.prevLoading = false;
+              })
+              .catch(function(error){
+                console.error(error);
+              });
+
+          //----- Main Content -----//
+
+          //----- Post Modal -----//
+          /*  var getCategories = axios.get('/dt/index.php/home/get_options/category')
+              .then(function(result){
+                self.categories = result.data;
+              })
+              .catch(function(error){
+                console.error(error);
+              });
+          */
+
+            var getSources = axios.get('<?php echo site_url(); ?>/api/option/GET/source')
+              .then(function(result){
+                self.sources = result.data.body;
+              })
+              .catch(function(error){
+                console.error(error);
+              });
         },
         methods: {
             openFbLoginDialog () {
@@ -459,17 +544,34 @@
               }, 1000);
             },
             loadMore: function () {
-              if( this.totalEntries < 20 ) {
-                // TODO:
-              }
-              this.loadPostOffset = this.loadPostOffset + 10;
-              this.loadingMore = true;
 
-              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/10/offset/' + this.loadPostOffset)
+              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/' + this.loadPostOffset)
                 .then( (result) => {
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
+                    this.postLoading = false;
+
+                    if(this.posts.length === 0) {
+                      this.postNoContent = true;
+                    } else {
+                      this.postNoContent = false;
+                    }
+
+                    this.totalEntries = result.data.total_entries;
                     this.loadingMore = false;
+
+                    var leftOver = result.data.total_entries - this.loadPostOffset;
+
+                    if( leftOver === 0) {
+                      this.loadingMore = false;
+                      this.loadPostOffset = this.loadPostOffset + leftOver;
+                    } else if ( leftOver <= 20 ) {
+                      this.loadPostOffset = this.loadPostOffset + leftOver;
+                      this.loadingMore = true;
+                    } else if( leftover > 20 ) {
+                      this.loadPostOffset = this.loadPostOffset + 20;
+                      this.loadingMore = true;
+                    }
                   }
                 })
                 .catch( (error) => {
@@ -480,107 +582,6 @@
         components: {
           BeatLoader,
           ClipLoader
-        },
-        beforeCreate: function () {
-          //----- Global -----//
-            var self = this;
-
-            setTimeout(function() {
-              new Fingerprint2().get(function(hash, components) {
-                self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
-                  bfp_hash: hash,
-                  bfp_components: components
-                })
-                  .then(function(response){
-                    self.user = response.data.body
-                    self.modalLoading = false
-
-                    if( self.user.post_count >= 3 ) {
-                      self.devilToken = 'You have no more devil token.';
-                    } else if( self.user.post_count == 2 ) {
-                      self.devilToken = 'You have 1 more devil token.';
-                    } else {
-                      self.devilToken = 'You have ' + (3 - self.user.post_count) + ' devil tokens.';
-                    }
-
-                    this.devilTokenCount = self.user.post_count;
-                  })
-                  .catch(function(error){
-                    console.log(error)
-                  });
-              })
-            }, 3000)
-        },
-        mounted: function () {
-          //----- Global -----//
-            var self = this
-
-          //----- Side Content -----//
-            var getMoods = axios.get('<?php echo site_url(); ?>/api/option/GET/mood')
-              .then(function(result){
-                self.moods = result.data.body;
-                self.moodLoading = false;
-
-                var moodRandom = Math.floor( Math.random() * result.data.body.length );
-                self.identityMood = result.data.body[moodRandom].value;
-                self.moodSelected = result.data.body[moodRandom].value;
-              })
-              .catch(function(error){
-                console.error(error);
-              });
-
-            var getAvatars = axios.get('<?php echo site_url(); ?>/api/option/GET/avatar')
-              .then(function(result){
-                self.avatars = result.data.body;
-
-                var avatarRandom = Math.floor( Math.random() * result.data.body.length );
-                self.identityLabel = result.data.body[avatarRandom].label;
-                self.avatarSelected = result.data.body[avatarRandom];
-
-
-                self.avatarIndex= avatarRandom;
-
-                self.prevLoading = false;
-              })
-              .catch(function(error){
-                console.error(error);
-              });
-
-            var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/0')
-              .then(function(result){
-                self.posts = result.data.body;
-                self.postLoading = false;
-                self.totalEntries = result.data.total_entries;
-
-                if(self.posts.length === 0) {
-                  self.postNoContent = true;
-                } else {
-                  self.postNoContent = false;
-                }
-              })
-              .catch(function(error){
-                console.error(error);
-              });
-
-          //----- Main Content -----//
-
-          //----- Post Modal -----//
-          /*  var getCategories = axios.get('/dt/index.php/home/get_options/category')
-              .then(function(result){
-                self.categories = result.data;
-              })
-              .catch(function(error){
-                console.error(error);
-              });
-          */
-
-            var getSources = axios.get('<?php echo site_url(); ?>/api/option/GET/source')
-              .then(function(result){
-                self.sources = result.data.body;
-              })
-              .catch(function(error){
-                console.error(error);
-              });
         }
       })
 
