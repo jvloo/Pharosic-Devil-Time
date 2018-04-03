@@ -15,3 +15,33 @@ FROM `avatar`
 ERROR - 2018-04-03 17:00:50 --> Query error: Table 'pharosic_dt.bfp_hash' doesn't exist - Invalid query: SELECT *
 FROM `bfp_hash`
 WHERE `bfp_hash` = 'c6b2eac2ff71ab7cf32a3c18b8caebb7'
+ERROR - 2018-04-03 17:01:48 --> Query error: Table 'pharosic_dt.avatar' doesn't exist - Invalid query: SELECT *
+FROM `avatar`
+ERROR - 2018-04-03 17:01:48 --> Query error: Table 'pharosic_dt.mood' doesn't exist - Invalid query: SELECT *
+FROM `mood`
+ERROR - 2018-04-03 17:01:48 --> Query error: Table 'pharosic_dt.post' doesn't exist - Invalid query: SELECT * FROM post LIMIT 20
+ERROR - 2018-04-03 17:01:48 --> Query error: Table 'pharosic_dt.source' doesn't exist - Invalid query: SELECT *
+FROM `source`
+ERROR - 2018-04-03 17:01:51 --> Query error: Table 'pharosic_dt.bfp_hash' doesn't exist - Invalid query: SELECT *
+FROM `bfp_hash`
+WHERE `bfp_hash` = 'c6b2eac2ff71ab7cf32a3c18b8caebb7'
+ERROR - 2018-04-03 17:05:20 --> Query error: Table 'pharosic_dt.mood' doesn't exist - Invalid query: SELECT *
+FROM `mood`
+ERROR - 2018-04-03 17:05:20 --> Query error: Table 'pharosic_dt.avatar' doesn't exist - Invalid query: SELECT *
+FROM `avatar`
+ERROR - 2018-04-03 17:05:20 --> Query error: Table 'pharosic_dt.post' doesn't exist - Invalid query: SELECT * FROM post LIMIT 20
+ERROR - 2018-04-03 17:05:20 --> Query error: Table 'pharosic_dt.source' doesn't exist - Invalid query: SELECT *
+FROM `source`
+ERROR - 2018-04-03 17:05:23 --> Query error: Table 'pharosic_dt.bfp_hash' doesn't exist - Invalid query: SELECT *
+FROM `bfp_hash`
+WHERE `bfp_hash` = 'c6b2eac2ff71ab7cf32a3c18b8caebb7'
+ERROR - 2018-04-03 17:06:17 --> Query error: Table 'pharosic_dt.mood' doesn't exist - Invalid query: SELECT *
+FROM `mood`
+ERROR - 2018-04-03 17:06:17 --> Query error: Table 'pharosic_dt.avatar' doesn't exist - Invalid query: SELECT *
+FROM `avatar`
+ERROR - 2018-04-03 17:06:17 --> Query error: Table 'pharosic_dt.source' doesn't exist - Invalid query: SELECT *
+FROM `source`
+ERROR - 2018-04-03 17:06:17 --> Query error: Table 'pharosic_dt.post' doesn't exist - Invalid query: SELECT * FROM post LIMIT 20
+ERROR - 2018-04-03 17:06:20 --> Query error: Table 'pharosic_dt.bfp_hash' doesn't exist - Invalid query: SELECT *
+FROM `bfp_hash`
+WHERE `bfp_hash` = 'c6b2eac2ff71ab7cf32a3c18b8caebb7'
