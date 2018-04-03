@@ -138,38 +138,57 @@ class Api extends CI_Controller {
 
 	public function user( $method = '', $hash = '', $components = [] ) {
 
-		if( $method === 'GET' ) {
+		if( $method === 'GET') {
 
 			header("Access-Control-Allow-Methods: GET");
+<<<<<<< HEAD
 
 			$error = false;
+=======
+>>>>>>> 549ad353e1d28be550c7c29fee60d82b2a499696
 
-			$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+			if( $this->uri->segment(4) === 'hash' ){
 
-			if( ! $error ) {
-				$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+				$error = false;
 
-				if( ! empty($bfp_id) ) {
-					$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
-					$user = $this->get_by('id', $uid_by_bfp, 'user');
+				$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+
+				if( ! $error ) {
+					$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+
+					if( ! empty($bfp_id) ) {
+						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+						$user = $this->get_by('id', $uid_by_bfp, 'user');
+					} else {
+						$user = [];
+					}
+
+					$response = array(
+						'status'	=> '200',
+						'code'		=> 'OK',
+						'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+						'body'	=> $user,
+					);
+
+					print_r( json_encode($response) );
+
 				} else {
-					$user = [];
+					$output = array(
+						'status'	=> '500',
+						'code'		=> 'InternalError',
+						'message'	=>	'The server encountered an internal error. Please retry the request.',
+						'body'		=>	'',
+					);
+
+					print_r( json_encode($output) );
 				}
 
-				$response = array(
-					'status'	=> '200',
-					'code'		=> 'OK',
-					'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-					'body'	=> $user,
-				);
-
-				print_r( json_encode($response) );
-
 			} else {
-				$output = array(
-					'status'	=> '500',
-					'code'		=> 'InternalError',
-					'message'	=>	'The server encountered an internal error. Please retry the request.',
+
+				$response = array(
+					'status'	=> '400',
+					'code'		=> 'InvalidQueryParameterValue',
+					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
 					'body'		=>	'',
 				);
 
@@ -179,157 +198,102 @@ class Api extends CI_Controller {
 		} else if( $method === 'POST' ) {
 
 			header("Access-Control-Allow-Methods: POST");
+<<<<<<< HEAD
 
 			$error = false;
-
-			$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
-			$bfp_components = ! empty($this->input->post('bfp_components')) ? json_encode($this->input->post('bfp_components')) : $error = true;
-
-			$ip_address = file_get_contents('https://api.ipify.org/');
-			$ip_components = file_get_contents('http://ip-api.com/json');
-
-			if( ! $error ) {
-
-				$exist_ip = $this->is_exist('ip_address', $ip_address);
-				$exist_bfp = $this->is_exist('bfp_hash', $bfp_hash);
-
-				// Both IP & BFP exist. Consider visitor as exist user.
-				if( $exist_ip && $exist_bfp ) {
-
-					$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
-					$ip_id = $this->get_by('ip_address', $ip_address)->id;
-
-					$uid_by_ip = $this->get_uid_by('ip_address', $ip_id);
-					$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id);
+=======
+>>>>>>> 549ad353e1d28be550c7c29fee60d82b2a499696
 
 
-					// IP address pointed to single user.
-					if( count($uid_by_ip) === 1 ) {
+			if( $this->uri->segment(4) === 'fb_connect' ){
 
-						$uid_by_ip = $uid_by_ip[0]['user_id'];
-						$uid_by_bfp = $uid_by_bfp[0]['user_id'];
+				$error = false;
 
-						// Both BFP and IP are NOT pointed to the same user.
-						// Consider user changes IP address.
-						if( $uid_by_ip !== $uid_by_bfp ) {
-							$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
+				$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
 
-						// Both BFP and IP are the same.
-						} else {
-							$user = $this->get_by('id', $uid_by_bfp, 'user');
-						}
 
-						$response = array(
-							'status'	=> '200',
-							'code'		=> 'OK',
-							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-							'body'	=> $user,
-						);
 
-						print_r( json_encode($response) );
 
-					// IP address pointed to multiple user.
-					} else {
 
-						$uid_by_bfp = $uid_by_bfp[0]['user_id'];
+			} else {
 
-						$is_identical = false;
-						foreach ( $uid_by_ip as $uid ) {
-							if( $uid['user_id'] === $uid_by_bfp ) {
-								$is_identical = true;
-								break;
-							}
-						}
+				$error = false;
 
-						if( $is_identical ) {
-							$user = $this->get_by('id', $uid_by_bfp, 'user');
-						// Consider user changes IP address.
-						} else {
-							$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
-						}
+				$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
+				$bfp_components = ! empty($this->input->post('bfp_components')) ? json_encode($this->input->post('bfp_components')) : $error = true;
 
-						$response = array(
-							'status'	=> '200',
-							'code'		=> 'OK',
-							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-							'body'	=> $user,
-						);
+				$ip_address = file_get_contents('https://api.ipify.org/');
+				$ip_components = file_get_contents('http://ip-api.com/json');
 
-						print_r( json_encode($response) );
-					}
+				if( ! $error ) {
 
-					$values = array(
-						'uid'			=> isset($uid_by_bfp) ? $uid_by_bfp : $bfp_id,
-						'bfp_id'	=> $bfp_id,
-						'ip_id'		=> $ip_id,
-					);
+					$exist_ip = $this->is_exist('ip_address', $ip_address);
+					$exist_bfp = $this->is_exist('bfp_hash', $bfp_hash);
 
-					$this->update_footprint('all', $values);
-
-				// Either IP or BFP not exist.
-				} else if( ! $exist_ip || ! $exist_bfp ) {
-
-					// Both IP & BFP not exist.
-					// Register visitor as new user.
-					if( ! $exist_ip && ! $exist_bfp ) {
-
-						// Mark new footprints.
-						$input = array(
-							'ip_address'		=>	$ip_address,
-							'components'	=>	$ip_components,
-						);
-
-						$ip_id = $this->mark_footprint('ip_address', $input);
-
-						$input = array(
-							'bfp_hash'		=>	$bfp_hash,
-							'components'	=>	$bfp_components,
-						);
-
-						$bfp_id = $this->mark_footprint('bfp_hash', $input);
-
-						// Create user.
-						$footprint = array(
-							'bfp_id'		=>	$bfp_id,
-							'ip_id'	=>	$ip_id,
-						);
-
-						$user = $this->user_create('anonymous', $footprint);
-
-						$response = array(
-							'status'	=> '200',
-							'code'		=> 'OK',
-							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-							'body'	=> $user,
-						);
-
-						print_r( json_encode($response) );
-
-					// Only BFP exists.
-					// Consider user changes IP address.
-					} else if( ! $exist_ip && $exist_bfp ) {
-
-						// Mark new footprints.
-						$input = array(
-							'ip_address'		=>	$ip_address,
-							'components'	=>	$ip_components,
-						);
-
-						$ip_id = $this->mark_footprint('ip_address', $input);
+					// Both IP & BFP exist. Consider visitor as exist user.
+					if( $exist_ip && $exist_bfp ) {
 
 						$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
-						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+						$ip_id = $this->get_by('ip_address', $ip_address)->id;
 
-						$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
+						$uid_by_ip = $this->get_uid_by('ip_address', $ip_id);
+						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id);
 
-						$response = array(
-							'status'	=> '200',
-							'code'		=> 'OK',
-							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-							'body'	=> $user,
-						);
 
-						print_r( json_encode($response) );
+						// IP address pointed to single user.
+						if( count($uid_by_ip) === 1 ) {
+
+							$uid_by_ip = $uid_by_ip[0]['user_id'];
+							$uid_by_bfp = $uid_by_bfp[0]['user_id'];
+
+							// Both BFP and IP are NOT pointed to the same user.
+							// Consider user changes IP address.
+							if( $uid_by_ip !== $uid_by_bfp ) {
+								$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
+
+							// Both BFP and IP are the same.
+							} else {
+								$user = $this->get_by('id', $uid_by_bfp, 'user');
+							}
+
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> $user,
+							);
+
+							print_r( json_encode($response) );
+
+						// IP address pointed to multiple user.
+						} else {
+
+							$uid_by_bfp = $uid_by_bfp[0]['user_id'];
+
+							$is_identical = false;
+							foreach ( $uid_by_ip as $uid ) {
+								if( $uid['user_id'] === $uid_by_bfp ) {
+									$is_identical = true;
+									break;
+								}
+							}
+
+							if( $is_identical ) {
+								$user = $this->get_by('id', $uid_by_bfp, 'user');
+							// Consider user changes IP address.
+							} else {
+								$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
+							}
+
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> $user,
+							);
+
+							print_r( json_encode($response) );
+						}
 
 						$values = array(
 							'uid'			=> isset($uid_by_bfp) ? $uid_by_bfp : $bfp_id,
@@ -339,48 +303,123 @@ class Api extends CI_Controller {
 
 						$this->update_footprint('all', $values);
 
-					// Only IP exists.
-					// Consider visitor shares IP with others. Register visitor as new user.
-					} else {
+					// Either IP or BFP not exist.
+					} else if( ! $exist_ip || ! $exist_bfp ) {
 
-						// Mark new footprints.
-						$input = array(
-							'bfp_hash'		=>	$bfp_hash,
-							'components'	=>	$bfp_components,
-						);
-						$bfp_id = $this->mark_footprint('bfp_hash', $input);
+						// Both IP & BFP not exist.
+						// Register visitor as new user.
+						if( ! $exist_ip && ! $exist_bfp ) {
 
-						$ip_id = $this->get_by('ip_address', $ip_address)->id;
+							// Mark new footprints.
+							$input = array(
+								'ip_address'		=>	$ip_address,
+								'components'	=>	$ip_components,
+							);
 
-						// Create user.
-						$footprint = array(
-							'bfp_id'		=>	$bfp_id,
-							'ip_id'	=>	$ip_id,
-						);
+							$ip_id = $this->mark_footprint('ip_address', $input);
 
-						$user = $this->user_create('anonymous', $footprint);
+							$input = array(
+								'bfp_hash'		=>	$bfp_hash,
+								'components'	=>	$bfp_components,
+							);
 
-						$response = array(
-							'status'	=> '200',
-							'code'		=> 'OK',
-							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-							'body'	=> $user,
-						);
+							$bfp_id = $this->mark_footprint('bfp_hash', $input);
 
-						print_r( json_encode($response) );
+							// Create user.
+							$footprint = array(
+								'bfp_id'		=>	$bfp_id,
+								'ip_id'	=>	$ip_id,
+							);
+
+							$user = $this->user_create('anonymous', $footprint);
+
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> $user,
+							);
+
+							print_r( json_encode($response) );
+
+						// Only BFP exists.
+						// Consider user changes IP address.
+						} else if( ! $exist_ip && $exist_bfp ) {
+
+							// Mark new footprints.
+							$input = array(
+								'ip_address'		=>	$ip_address,
+								'components'	=>	$ip_components,
+							);
+
+							$ip_id = $this->mark_footprint('ip_address', $input);
+
+							$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+							$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+
+							$user = $this->link_user_with($uid_by_bfp, $ip_id, 'ip_address');
+
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> $user,
+							);
+
+							print_r( json_encode($response) );
+
+							$values = array(
+								'uid'			=> isset($uid_by_bfp) ? $uid_by_bfp : $bfp_id,
+								'bfp_id'	=> $bfp_id,
+								'ip_id'		=> $ip_id,
+							);
+
+							$this->update_footprint('all', $values);
+
+						// Only IP exists.
+						// Consider visitor shares IP with others. Register visitor as new user.
+						} else {
+
+							// Mark new footprints.
+							$input = array(
+								'bfp_hash'		=>	$bfp_hash,
+								'components'	=>	$bfp_components,
+							);
+							$bfp_id = $this->mark_footprint('bfp_hash', $input);
+
+							$ip_id = $this->get_by('ip_address', $ip_address)->id;
+
+							// Create user.
+							$footprint = array(
+								'bfp_id'		=>	$bfp_id,
+								'ip_id'	=>	$ip_id,
+							);
+
+							$user = $this->user_create('anonymous', $footprint);
+
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> $user,
+							);
+
+							print_r( json_encode($response) );
+						}
+
 					}
 
+				} else {
+					$output = array(
+						'status'	=> '500',
+						'code'		=> 'InternalError',
+						'message'	=>	'The server encountered an internal error. Please retry the request.',
+						'body'		=>	'',
+					);
+
+					print_r( json_encode($output) );
 				}
 
-			} else {
-				$output = array(
-					'status'	=> '500',
-					'code'		=> 'InternalError',
-					'message'	=>	'The server encountered an internal error. Please retry the request.',
-					'body'		=>	'',
-				);
-
-				print_r( json_encode($output) );
 			}
 
 		} else {
