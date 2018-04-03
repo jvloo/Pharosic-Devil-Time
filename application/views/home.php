@@ -94,7 +94,7 @@
                       <div class="item">
                         <span>Login to comment</span>
                         <a href="#" @click="fbLogin"><i class="facebook big icon"></i></a>
-                        <a href="#"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
+                        <a href="#" v-show="false"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
                       </div>
                     </div>
                   </div>
@@ -221,9 +221,10 @@
               </div>
             </div>
           </div>
-          <div class="ui header" style="color: #FFFFFF; font-size: 15px; text-align: justify; padding: 10px 20px; margin-top: 20px">
-            Share your story with us.
-            <span class="" style="float: right; cursor: pointer" @click="closePostModal"><i class="close icon"></i></span>
+          <div class="ui header" style="color: #FFFFFF; font-size: 15px; text-align: justify; padding: 5px 20px; margin-top: 20px">
+            <img style="padding: 0px; margin: 0px; margin-right: 15px" src="https://image.flaticon.com/icons/png/512/301/301914.png">
+            <span style="font-size: 20px">Stay evil and share your secret with us.</span>
+            <span class="" style="padding: 10px; float: right; cursor: pointer" @click="closePostModal"><i class="close icon"></i></span>
           </div>
           <div class="ui form" style="padding: 0px 20px">
             <div class="field">
