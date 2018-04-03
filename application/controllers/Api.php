@@ -70,6 +70,8 @@ class Api extends CI_Controller {
 
 		} else if( $method === 'POST' ) {
 
+			header("Access-Control-Allow-Methods: POST");
+
 			$error = false;
 
 			$author_name = ! empty($this->input->post('author_name')) ? $this->input->post('author_name') : $error = true;
@@ -136,36 +138,55 @@ class Api extends CI_Controller {
 
 	public function user( $method = '', $hash = '', $components = [] ) {
 
-		if( $method === 'GET' ) {
+		if( $method === 'GET') {
+			
+			header("Access-Control-Allow-Methods: GET");
 
-			$error = false;
+			if( $this->uri->segment(4) === 'hash' ){
 
-			$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+				$error = false;
 
-			if( ! $error ) {
-				$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+				$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
 
-				if( ! empty($bfp_id) ) {
-					$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
-					$user = $this->get_by('id', $uid_by_bfp, 'user');
+				if( ! $error ) {
+					$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+
+					if( ! empty($bfp_id) ) {
+						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+						$user = $this->get_by('id', $uid_by_bfp, 'user');
+					} else {
+						$user = [];
+					}
+
+					$response = array(
+						'status'	=> '200',
+						'code'		=> 'OK',
+						'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+						'body'	=> $user,
+					);
+
+					print_r( json_encode($response) );
+
 				} else {
-					$user = [];
+					$output = array(
+						'status'	=> '500',
+						'code'		=> 'InternalError',
+						'message'	=>	'The server encountered an internal error. Please retry the request.',
+						'body'		=>	'',
+					);
+
+					print_r( json_encode($output) );
 				}
+			} else if (  $this->uri->segment(4) === 'fbid' ) {
 
-				$response = array(
-					'status'	=> '200',
-					'code'		=> 'OK',
-					'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-					'body'	=> $user,
-				);
 
-				print_r( json_encode($response) );
 
 			} else {
-				$output = array(
-					'status'	=> '500',
-					'code'		=> 'InternalError',
-					'message'	=>	'The server encountered an internal error. Please retry the request.',
+
+				$response = array(
+					'status'	=> '400',
+					'code'		=> 'InvalidQueryParameterValue',
+					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
 					'body'		=>	'',
 				);
 
@@ -173,6 +194,8 @@ class Api extends CI_Controller {
 			}
 
 		} else if( $method === 'POST' ) {
+
+			header("Access-Control-Allow-Methods: POST");
 
 			$error = false;
 
@@ -393,6 +416,8 @@ class Api extends CI_Controller {
 	public function option( $method = '' ) {
 
 		if( $method === 'GET' ) {
+
+			header("Access-Control-Allow-Methods: GET");
 
 			if( ! empty( $this->uri->segment(4) ) ) {
 

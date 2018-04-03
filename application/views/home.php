@@ -488,12 +488,36 @@
             fbLogin: function () {
               FB.login(function(response) {
                   if (response.authResponse) {
-                   console.log('Welcome!  Fetching your information.... ');
+
                    FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
-                     console.log(JSON.stringify(response));
+
+                     this.$http.post('<?php echo site_url(); ?>/api/user/POST/fb_connect', {
+                      uid: this.user.id,
+                      fbid: respond.id,
+                      email: respond.email,
+                      full_name: respond.name,
+                      first_name: respond.first_name,
+                      last_name: respond.last_name,
+                      age: respond.age_range.min_age,
+                      gender: respond.gender,
+                      profile: respond.link,
+                      profile_avatar: response.picture,
+                      profile_cover: response.cover,
+                      locale: response.locale,
+                      timezone: response.timezone,
+                      updated_time: response.updated_time,
+                      verified: response.verified,
+                    })
+                      .then(function(response)) {
+                        console.log('FB Connect: Succeed!');
+                      })
+                      .catch(function(error)) {
+                        console.log('FB Connect: ' + error);
+                      });
+
                    });
                   } else {
-                   console.log('User cancelled login or did not fully authorize.');
+                   console.log('FB Connect: User cancelled login or did not fully authorize.');
                   }
               },{
                 scope: 'public_profile, email',
@@ -504,7 +528,7 @@
 
             fbLogout: function () {
               FB.logout(function(response) {
-                console.log('logged out!');
+                console.log('FB Connect: User logged out!');
               });
             },
           //----- Side Content -----//
