@@ -18,3 +18,6 @@ ERROR - 2018-04-03 11:19:15 --> Severity: Notice --> Array to string conversion 
 ERROR - 2018-04-03 11:19:15 --> Query error: Unknown column 'Array' in 'where clause' - Invalid query: SELECT *
 FROM `user`
 WHERE `id` = `Array`
+ERROR - 2018-04-03 17:23:13 --> Severity: Warning --> mysqli::real_connect(): (HY000/2002): No connection could be made because the target machine actively refused it.
+ D:\localhost\eds-www\devil_time\system\database\drivers\mysqli\mysqli_driver.php 201
+ERROR - 2018-04-03 17:23:13 --> Unable to connect to the database

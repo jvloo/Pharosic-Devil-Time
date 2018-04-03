@@ -70,6 +70,8 @@ class Api extends CI_Controller {
 
 		} else if( $method === 'POST' ) {
 
+			header("Access-Control-Allow-Methods: POST");
+
 			$error = false;
 
 			$author_name = ! empty($this->input->post('author_name')) ? $this->input->post('author_name') : $error = true;
@@ -138,6 +140,8 @@ class Api extends CI_Controller {
 
 		if( $method === 'GET' ) {
 
+			header("Access-Control-Allow-Methods: GET");
+
 			$error = false;
 
 			$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
@@ -173,6 +177,8 @@ class Api extends CI_Controller {
 			}
 
 		} else if( $method === 'POST' ) {
+
+			header("Access-Control-Allow-Methods: POST");
 
 			$error = false;
 
@@ -393,6 +399,8 @@ class Api extends CI_Controller {
 	public function option( $method = '' ) {
 
 		if( $method === 'GET' ) {
+
+			header("Access-Control-Allow-Methods: GET");
 
 			if( ! empty( $this->uri->segment(4) ) ) {
 
