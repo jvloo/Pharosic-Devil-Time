@@ -108,6 +108,8 @@ class Api extends CI_Controller {
 					'body'	=> $this->db->affected_rows(),
 				);
 
+				$this->update_post_count($user_id);
+
 				print_r( json_encode($response) );
 			} else {
 
@@ -619,7 +621,7 @@ class Api extends CI_Controller {
 
 		$input['last_post']	= $curr_date;
 
-		if( $last_post === $curr_date ) {
+		if( $last_post == $curr_date ) {
 			$post_count = $this->get_by('id', $uid, 'user')->post_count;
 			$input['post_count'] = $post_count + 1;
 		} else {

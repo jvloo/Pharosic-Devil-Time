@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.3.0/css/perfect-scrollbar.min.css" />
   </head>
   <body>
-    <div id="app">
+    <div id="app" >
       <div class="ui two column doubling stackable grid">
         <div class="row" style="padding-bottom: 0px">
 
@@ -93,7 +93,7 @@
                     <div class="right menu">
                       <div class="item">
                         <span>Login to comment</span>
-                        <a href="#" @click="openFbLoginDialog"><i class="facebook big icon"></i></a>
+                        <a href="#" @click="openFbLoginDialog" scope="public_profile,email" onlogin="checkLoginState();"><i class="facebook big icon"></i></a>
                         <a href="#"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
                       </div>
                     </div>
@@ -422,10 +422,41 @@
               });
         },
         methods: {
-            openFbLoginDialog () {
-               FB.login(function(response) {
-                   console.log(response);
-                }, { scope: 'email' })
+
+          checkFBLoginStatus: function () {
+            FB.getLoginStatus(function(response) {
+              if (response.status === 'connected') {
+                // the user is logged in and has authenticated your
+                // app, and response.authResponse supplies
+                // the user's ID, a valid access token, a signed
+                // request, and the time the access token
+                // and signed request each expire
+                var uid = response.authResponse.userID;
+                var accessToken = response.authResponse.accessToken;
+
+                console.log(uid + accessToken);
+              } else if (response.status === 'not_authorized') {
+                // the user is logged in to Facebook,
+                // but has not authenticated your app
+              } else {
+                // the user isn't logged in to Facebook.
+              }
+            });
+          },
+            openFbLoginDialog: function () {
+              FB.login(function(response) {
+                  if (response.authResponse) {
+                   console.log('Welcome!  Fetching your information.... ');
+                   FB.api('/me', function(response) {
+                     console.log(response);
+                   });
+                  } else {
+                   console.log('User cancelled login or did not fully authorize.');
+                  }
+              },{
+                scope: 'email, public_profile',
+                return_scopes: true,
+              });
             },
           //----- Side Content -----//
             moodChange: function () {
@@ -545,38 +576,41 @@
             },
             loadMore: function () {
 
+              this.loadingMore = false;
+
+              var leftOver = this.totalEntries - this.loadPostOffset;
+
+              if( leftOver === 0) {
+                this.loadingMore = false;
+                this.loadPostOffset = this.loadPostOffset + leftOver;
+              } else if ( leftOver <= 20 ) {
+                this.loadPostOffset = this.loadPostOffset + leftOver;
+                this.loadingMore = true;
+                // BUG: duplicate posts when loading more posts after new post submitted.
+              } else if( leftOver > 20 ) {
+                this.loadPostOffset = this.loadPostOffset + 20;
+                this.loadingMore = true;
+              }
+
               var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/' + this.loadPostOffset)
                 .then( (result) => {
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
-                    this.postLoading = false;
-
-                    if(this.posts.length === 0) {
-                      this.postNoContent = true;
-                    } else {
-                      this.postNoContent = false;
-                    }
-
-                    this.totalEntries = result.data.total_entries;
-                    this.loadingMore = false;
-
-                    var leftOver = result.data.total_entries - this.loadPostOffset;
-
-                    if( leftOver === 0) {
-                      this.loadingMore = false;
-                      this.loadPostOffset = this.loadPostOffset + leftOver;
-                    } else if ( leftOver <= 20 ) {
-                      this.loadPostOffset = this.loadPostOffset + leftOver;
-                      this.loadingMore = true;
-                    } else if( leftover > 20 ) {
-                      this.loadPostOffset = this.loadPostOffset + 20;
-                      this.loadingMore = true;
-                    }
                   }
+
+                  if(this.posts.length === 0) {
+                    this.postNoContent = true;
+                  } else {
+                    this.postNoContent = false;
+                  }
+
+                  this.totalEntries = result.data.total_entries;
+                  this.postLoading = false;
                 })
                 .catch( (error) => {
                   console.error(error);
                 });
+
             }
         },
         components: {
