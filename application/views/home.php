@@ -91,10 +91,17 @@
                     <a class="item">Newest</a>
 
                     <div class="right menu">
-                      <div class="item">
+                      <div class="item" v-show="modalLoading">
+                        <beat-loader :loading="modalLoading" color="#1678C2" size="10px" margin="2px" radius="100%" style="margin-left: 20px; margin-bottom: 5px;"></beat-loader>
+                      </div>
+                      <div class="item" v-show=" ! modalLoading" v-if=" ! fbLoggedIn">
                         <span>Login to comment</span>
-                        <a href="#" @click="fbLogin"><i class="facebook big icon"></i></a>
+                        <a href="#" @click="fbLogIn"><i class="facebook big icon"></i></a>
                         <a href="#" v-show="false"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
+                      </div>
+                      <div class="item" v-show=" ! modalLoading" v-if="fbLoggedIn">
+                        <span>Hi, {{ fbUserName }}</span>
+                        <span><a href="#" @click="fbLogOut" style="font-size: 20px; color: #1678C2"><i class="sign out alternate icon" alt="Log out my Facebook"></i></a></span>
                       </div>
                     </div>
                   </div>
@@ -105,7 +112,7 @@
                   <div class="loader" v-show="postNoContent">
                     No content.
                   </div>
-                  <div class="ui container" v-show=" ! postLoading" v-infinite-scroll="loadMore" infinite-scroll-distance="10">
+                  <div class="ui container" v-show=" ! postLoading" v-infinite-scroll="loadPost" infinite-scroll-distance="10">
                     <article class="ui fluid card" v-for="post in posts">
                       <div class="article content">
                         <span class="meta">
@@ -136,18 +143,36 @@
                         </div>
                       </div>
                       <div class="action content">
-                        <a class="like">
-                          <i class="heart like active icon"></i>
-                            {{ post.likes }} likes
+                        <a class="like" @click="userLikedPost.includes(post.id) ? (userLikedPost.splice(userLikedPost.indexOf(post.id), 1), postUnliked(post)) : (userLikedPost.push(post.id), postLiked(post))">
+                          <i :class="{'heart like icon': true, active: userLikedPost.includes(post.id) }"  @click="userLikedPost.includes(post.id) ? userLikedPost.splice(userLikedPost.indexOf(post.id), 1) : userLikedPost.push(post.id)"></i>
+                            {{ post.likes }}
+                            <span v-if="post.likes <= 1">
+                              like
+                            </span>
+                            <span v-else>
+                              likes
+                            </span>
                         </a>
                         <span class="right floated">
                           <a class="comment">
                             <i class="comment icon"></i>
-                            {{ post.comments }} comments
+                            {{ post.comments }}
+                            <span v-if="post.comments <= 1">
+                              comment
+                            </span>
+                            <span v-else>
+                              comments
+                            </span>
                           </a>
                           <a class="share">
                             <i class="share icon"></i>
-                            {{ post.shares }} shares
+                            {{ post.shares }}
+                            <span v-if="post.shares <= 1">
+                              share
+                            </span>
+                            <span v-else>
+                              shares
+                            </span>
                           </a>
                         </span>
                       </div>
@@ -236,7 +261,7 @@
               <div class="two wide field">
                 <select class="ui search dropdown" v-model="source" style="width: 200px; font-size: 15px">
                   <option value="">Select University</option>
-                  <option v-for="source in sources" :value="source.value">{{ source.label }}</option>
+                  <option v-for="source in sources" :value="source.label">{{ source.label }}</option>
                 </select>
               </div>
             </div>
@@ -282,6 +307,9 @@
             devilToken: '',
             devilTokenCount: 0,
 
+            fbLoggedIn: false,
+            fbUserName: '',
+
           //----- Side Content -----//
             prevLoading: true,
             moodLoading: true,
@@ -308,6 +336,8 @@
 
             loadPostOffset: 0,
             loadingMore: true,
+
+            userLikedPost: [],
 
           //----- Post Modal -----//
             postModal: false,
@@ -365,15 +395,15 @@
 
                         self.devilTokenCount = self.user.post_count;
 
-                        console.log('GET Hash: Succeed!');
+                        console.log('GET UUID: Succeed!');
                       })
                       .catch(function(error) {
-                        console.log('GET Hash Error: ' + error)
+                        console.log('GET UUID Error: ' + error)
                       });
 
                   })
                   .catch(function(error){
-                    console.log('GET Hash Error: ' + error)
+                    console.log('GET UIID Error: ' + error)
                   });
 
 
@@ -400,9 +430,22 @@
                   var uid = response.authResponse.userID;
                   var accessToken = response.authResponse.accessToken;
 
-                  FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
-                    console.log(JSON.stringify(response));
+                  FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone'}, function(response) {
+
+                    var fbData = response;
+
+                    self.$http.post('<?php echo site_url(); ?>/api/user/GET/fb_connect/' + fbData.id)
+                      .then(function(response){
+                        console.log('FB Connect: Succeed!');
+                        self.fbLoggedIn = true;
+                        self.fbUserName = fbData.name;
+                      })
+                      .catch(function(error){
+                         console.error('FB Connect Error: ' + error);
+                      });
+
                   });
+
 
                   /*self.$http.post('<?php echo site_url(); ?>/api/user/GET/', {
                     bfp_hash: hash,
@@ -413,10 +456,10 @@
                 } else if (response.status === 'not_authorized') {
                   // the user is logged in to Facebook,
                   // but has not authenticated your app
-                  console.log('not authorized');
+                  console.log('FB Connect Error: User has not authorized access.');
                 } else {
                   // the user isn't logged in to Facebook.
-                  console.log('not logged in');
+                  console.log('FB Connect Error: User is not logged in.');
 
                 }
               });
@@ -431,6 +474,7 @@
              }(document, 'script', 'facebook-jssdk'));
         },
         mounted: function () {
+
           //----- Global -----//
             var self = this
 
@@ -492,35 +536,41 @@
         },
         methods: {
           //----- FB Connect -----//
-            fbLogin: function () {
+            fbLogIn: function () {
+
+              var self = this;
+
               FB.login(function(response) {
 
                   if (response.authResponse) {
-                   FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
+                   FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone'}, function(response) {
 
-                     this.$http.post('<?php echo site_url(); ?>/api/user/POST/fb_connect', {
-                      uid: this.user.id,
-                      fbid: respond.id,
-                      email: respond.email,
-                      full_name: respond.name,
-                      first_name: respond.first_name,
-                      last_name: respond.last_name,
-                      age: respond.age_range.min_age,
-                      gender: respond.gender,
-                      profile: respond.link,
-                      profile_avatar: response.picture,
-                      profile_cover: response.cover,
-                      locale: response.locale,
-                      timezone: response.timezone,
-                      updated_time: response.updated_time,
-                      verified: response.verified,
-                    })
-                      .then(function(response)) {
-                        console.log('FB Connect: Succeed!');
-                      })
-                      .catch(function(error)) {
-                        console.error('FB Connect Error: ' + error);
-                      });
+                     var fbData = response;
+
+                     self.$http.post('<?php echo site_url(); ?>/api/user/POST/fb_connect/', {
+                       user_id: self.user.id,
+                       fb_id: fbData.id,
+                       email: fbData.email,
+                       full_name: fbData.name,
+                       first_name: fbData.first_name,
+                       last_name: fbData.last_name,
+                       age: fbData.age_range.min,
+                       gender: fbData.gender,
+                       profile: fbData.link,
+                       profile_avatar: fbData.picture.data.url,
+                       profile_cover: fbData.cover.source,
+                       locale: fbData.locale,
+                       timezone: fbData.timezone
+                     })
+                       .then(function(response){
+                         console.log('FB Connect: Succeed!');
+                         alert('Welcome back, ' + fbData.name + '!\n\nNote: Please log out Facebook before posting your new confession in order to stay anonymous.')
+                         self.fbLoggedIn = true;
+                         self.fbUserName = fbData.name;
+                       })
+                       .catch(function(error){
+                          console.error('FB Connect Error: ' + error);
+                       });
 
                    });
                   } else {
@@ -534,14 +584,20 @@
               });
             },
 
-            fbLogout: function () {
+            fbLogOut: function () {
+              var self = this;
               FB.logout(function(response) {
                 console.log('FB Connect: User logged out!');
+                alert('You have successfully logged out and diving among the anonymous devils.');
+                self.fbLoggedIn = false;
+                self.fbUserName = '';
               });
             },
 
           //----- Side Content -----//
             moodChange: function () {
+              console.log(this.userLikedPost);
+
               this.identityMood = this.moodSelected;
             },
 
@@ -577,6 +633,22 @@
               return timeago().format(dateTime); // BUG: Time seems not parsed.
             },
 
+            postLiked: function(element) {
+              this.posts.forEach((e, i) => {
+                if (e.id == element.id) {
+                  this.posts[i].likes = Number(this.posts[i].likes) + 1;
+                }
+              });
+            },
+
+            postUnliked: function(element) {
+              this.posts.forEach((e, i) => {
+                if (e.id == element.id) {
+                  this.posts[i].likes = Number(this.posts[i].likes) - 1;
+                }
+              });
+            },
+
           //----- Post Modal -----//
             showPostModal: function () {
               $('.ui.basic.modal').modal('setting', {autofocus: false}).modal('show'); // TODO: Emit semantic-ui jquery modal
@@ -595,6 +667,7 @@
               }
             },
             postSubmit: function (event) {
+
               this.errors = [];
 
               if( this.category.length <= 0 ) {
@@ -621,7 +694,7 @@
                   user_id: this.user.id,
                 })
                   .then(function(response){
-                    alert('Your confession #post-id has been posted.')
+                    alert('Your confession has been posted.')
                     console.log('Post Submit: Succeed!');
                     event.target.reset();
                     this.description = '';
@@ -657,7 +730,7 @@
                 $state.loaded();
               }, 1000);
             },
-            loadMore: function () {
+            loadPost: function () {
 
               this.loadingMore = false;
 
@@ -678,6 +751,7 @@
               var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/' + this.loadPostOffset)
                 .then( (result) => {
                   console.log('GET Posts: Succeed!');
+
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
                   }

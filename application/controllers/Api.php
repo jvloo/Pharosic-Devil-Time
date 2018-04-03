@@ -151,10 +151,10 @@ class Api extends CI_Controller {
 				$bfp_hash = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
 
 				if( ! $error ) {
-					$bfp_id = $this->get_by('bfp_hash', $bfp_hash)->id;
+					$bfp = $this->get_by('bfp_hash', $bfp_hash);
 
-					if( ! empty($bfp_id) ) {
-						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp_id)[0]['user_id'];
+					if( ! empty($bfp) ) {
+						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp->id)[0]['user_id'];
 						$user = $this->get_by('id', $uid_by_bfp, 'user');
 					} else {
 						$user = [];
@@ -180,6 +180,33 @@ class Api extends CI_Controller {
 					print_r( json_encode($output) );
 				}
 
+			} else if (	$this->uri->segment(4) === 'fb_connect' ) {
+
+				$error = false;
+
+				$fb_id = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+
+				if( ! $error ) {
+					$this->update_footprint('fb', array('fb_id' => $fb_id));
+
+					$response = array(
+						'status'	=> '200',
+						'code'		=> 'OK',
+						'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+						'body'	=> '',
+					);
+
+					print_r( json_encode($response) );
+				} else {
+					$output = array(
+						'status'	=> '500',
+						'code'		=> 'InternalError',
+						'message'	=>	'The server encountered an internal error. Please retry the request.',
+						'body'		=>	'',
+					);
+
+					print_r( json_encode($output) );
+				}
 			} else {
 
 				$response = array(
@@ -202,11 +229,78 @@ class Api extends CI_Controller {
 
 				$error = false;
 
-				$bfp_hash = ! empty($this->input->post('bfp_hash')) ? $this->input->post('bfp_hash') : $error = true;
+				$user_id = ! empty($this->input->post('user_id')) ? $this->input->post('user_id') : $error = true;
+				$fb_id = ! empty($this->input->post('fb_id')) ? $this->input->post('fb_id') : $error = true;
+				$email = ! empty($this->input->post('email')) ? $this->input->post('email') : $error = true;
+				$full_name = ! empty($this->input->post('full_name')) ? $this->input->post('full_name') : $error = true;
+				$first_name = ! empty($this->input->post('first_name')) ? $this->input->post('first_name') : $error = true;
+				$last_name = ! empty($this->input->post('last_name')) ? $this->input->post('last_name') : $error = true;
+				$age = ! empty($this->input->post('age')) ? $this->input->post('age') : $error = true;
+				$gender = ! empty($this->input->post('gender')) ? $this->input->post('gender') : $error = true;
+				$profile = ! empty($this->input->post('profile')) ? $this->input->post('profile') : $error = true;
+				$profile_avatar = ! empty($this->input->post('profile_avatar')) ? $this->input->post('profile_avatar') : $error = true;
+				$profile_cover = ! empty($this->input->post('profile_cover')) ? $this->input->post('profile_cover') : $error = true;
+				$locale = ! empty($this->input->post('locale')) ? $this->input->post('locale') : $error = true;
+				$timezone = ! empty($this->input->post('timezone')) ? $this->input->post('timezone') : $error = true;
 
+				if( ! $error ) {
 
+					if( ! $this->is_exist('fb_id', $fb_id, 'user_fb') ) {
 
+						$input = array(
+							'user_id'					=>	$user_id,
+							'fb_id'						=>	$fb_id,
+							'email'						=>	$email,
+							'full_name'				=>	$full_name,
+							'first_name'			=>	$first_name,
+							'last_name'				=>	$last_name,
+							'age'							=>	$age,
+							'gender'					=>	$gender,
+							'profile'					=>	$profile,
+							'profile_avatar'	=>	$profile_avatar,
+							'profile_cover'		=>	$profile_cover,
+							'locale'					=>	$locale,
+							'timezone'				=>	$timezone,
+							'visit_count'			=>	1,
+							'created_on'			=>	date('Y-m-d H:i:s'),
+						);
 
+						$this->db->insert('user_fb', $input);
+
+						if( $this->db->affected_rows() > 0 ) {
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> '',
+							);
+
+							print_r( json_encode($response) );
+						}
+					} else {
+						$this->update_footprint('fb', array('fb_id' => $fb_id));
+
+						$response = array(
+							'status'	=> '200',
+							'code'		=> 'OK',
+							'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+							'body'	=> '',
+						);
+
+						print_r( json_encode($response) );
+
+					}
+
+				} else {
+					$output = array(
+						'status'	=> '500',
+						'code'		=> 'InternalError',
+						'message'	=>	'The server encountered an internal error. Please retry the request.',
+						'body'		=>	'',
+					);
+
+					print_r( json_encode($output) );
+				}
 
 			} else {
 
@@ -691,6 +785,21 @@ class Api extends CI_Controller {
 
 			$this->db->where('id', $values['uid'])
 							 ->update('user', $input);
+		}
+
+		if( $option === 'fb' ) {
+
+			$last_visit = $this->get_by('fb_id', $values['fb_id'], 'user_fb')->last_visit;
+			$curr_date = date('Y-m-d');
+			preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $last_visit, $last_date);
+
+			if( $last_date[0] !==  $curr_date ) {
+				$visit_count = $this->get_by('fb_id', $values['fb_id'], 'user_fb')->visit_count;
+				$input['visit_count'] = $visit_count + 1;
+			}
+
+			$this->db->where('fb_id', $values['fb_id'])
+							 ->update('user_fb', $input);
 		}
 
 	}
