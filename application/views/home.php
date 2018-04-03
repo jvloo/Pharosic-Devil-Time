@@ -364,14 +364,16 @@
                         }
 
                         self.devilTokenCount = self.user.post_count;
+
+                        console.log('GET Hash: Succeed!');
                       })
                       .catch(function(error) {
-                        console.log(error)
+                        console.log('GET Hash Error: ' + error)
                       });
 
                   })
                   .catch(function(error){
-                    console.log(error)
+                    console.log('GET Hash Error: ' + error)
                   });
 
 
@@ -441,9 +443,11 @@
                 var moodRandom = Math.floor( Math.random() * result.data.body.length );
                 self.identityMood = result.data.body[moodRandom].value;
                 self.moodSelected = result.data.body[moodRandom].value;
+
+                console.log('GET Moods: Succeed!');
               })
               .catch(function(error){
-                console.error(error);
+                console.error('GET Moods Error: ' + error);
               });
 
             var getAvatars = axios.get('<?php echo site_url(); ?>/api/option/GET/avatar')
@@ -458,9 +462,11 @@
                 self.avatarIndex= avatarRandom;
 
                 self.prevLoading = false;
+
+                console.log('GET Avatars: Succeed!');
               })
               .catch(function(error){
-                console.error(error);
+                console.error('GET Avatars Error: ' + error);
               });
 
           //----- Main Content -----//
@@ -478,17 +484,18 @@
             var getSources = axios.get('<?php echo site_url(); ?>/api/option/GET/source')
               .then(function(result){
                 self.sources = result.data.body;
+                console.log('GET Sources: Succeed!')
               })
               .catch(function(error){
-                console.error(error);
+                console.error('GET Sources Error: ' + error);
               });
         },
         methods: {
-          //----- FB Login Button -----//
+          //----- FB Connect -----//
             fbLogin: function () {
               FB.login(function(response) {
-                  if (response.authResponse) {
 
+                  if (response.authResponse) {
                    FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone, updated_time, verified'}, function(response) {
 
                      this.$http.post('<?php echo site_url(); ?>/api/user/POST/fb_connect', {
@@ -512,13 +519,14 @@
                         console.log('FB Connect: Succeed!');
                       })
                       .catch(function(error)) {
-                        console.log('FB Connect: ' + error);
+                        console.error('FB Connect Error: ' + error);
                       });
 
                    });
                   } else {
-                   console.log('FB Connect: User cancelled login or did not fully authorize.');
+                   console.error('FB Connect Error: User cancelled login or did not fully authorize.');
                   }
+
               },{
                 scope: 'public_profile, email',
                 return_scopes: true,
@@ -531,6 +539,7 @@
                 console.log('FB Connect: User logged out!');
               });
             },
+
           //----- Side Content -----//
             moodChange: function () {
               this.identityMood = this.moodSelected;
@@ -565,7 +574,7 @@
 
           //----- Main Content -----//
             timeAgo: function (dateTime) {
-              return timeago().format(dateTime);
+              return timeago().format(dateTime); // BUG: Time seems not parsed.
             },
 
           //----- Post Modal -----//
@@ -589,7 +598,7 @@
               this.errors = [];
 
               if( this.category.length <= 0 ) {
-                //this.errors.push('Please select at least one category.');
+                // NOTE (DEPRECIATED): this.errors.push('Please select at least one category.');
               }
               if( ! this.description || this.description === textareaNotice) {
                 this.errors.push('Post description should not be empty.');
@@ -608,15 +617,16 @@
                   author_avatar: this.avatarSelected.filename,
                   description: this.description,
                   source: this.source,
-                  // quote_id: this.quote_id,
+                  // TODO: quote_id: this.quote_id,
                   user_id: this.user.id,
                 })
                   .then(function(response){
                     alert('Your confession #post-id has been posted.')
-                    event.target.reset()
-                    this.description = ''
-                    this.source = ''
-                    this.category = []
+                    console.log('Post Submit: Succeed!');
+                    event.target.reset();
+                    this.description = '';
+                    this.source = '';
+                    this.category = [];
 
                     if( this.devilTokenCount <= 3 ) {
                       this.devilTokenCount = ++this.devilTokenCount;
@@ -632,8 +642,8 @@
 
                   })
                   .catch(function(error){
-                      alert('Post Submit: Unexpected error occurred. Please send feedback to CT admin.')
-                      console.log(error)
+                      alert('Post Submit: Unexpected error occurred. Please send feedback to admin.')
+                      console.error('Post Submit Error: ' + error);
                   });
               }
             },
@@ -667,6 +677,7 @@
 
               var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/' + this.loadPostOffset)
                 .then( (result) => {
+                  console.log('GET Posts: Succeed!');
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
                   }
@@ -681,7 +692,7 @@
                   this.postLoading = false;
                 })
                 .catch( (error) => {
-                  console.error(error);
+                  console.error('GET Posts Error: ' + error);
                 });
 
             }
