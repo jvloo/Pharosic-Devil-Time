@@ -443,6 +443,22 @@
                          console.error('FB Connect Error: ' + error);
                       });
 
+
+                    self.$http.get('<?php echo site_url(); ?>/api/action/GET/all/' + self.fbData.id)
+                      .then(function(response) {
+
+                        for (let i = 0; i < response.body.body.liked.length; i++) {
+                          if( ! self.userLikedPost.includes(response.body.body.liked[i]) ) {
+                            self.userLikedPost.push(response.body.body.liked[i]);
+                          }
+                        }
+
+                        //self.userSharedPost.push(response.shared);
+                      })
+                      .catch(function(error) {
+                        console.error('GET Post Actions Error: ' + error);
+                      });
+
                   });
 
 
@@ -565,11 +581,25 @@
                          console.log('FB Connect: Succeed!');
                          alert('Welcome back, ' + self.fbData.name + '!\n\nNote: Please log out Facebook before posting your new confession in order to stay anonymous.')
                          self.fbLoggedIn = true;
+
+                         self.$http.get('<?php echo site_url(); ?>/api/action/GET/all/' + self.fbData.id)
+                           .then(function(response) {
+
+                             for (let i = 0; i < response.body.body.liked.length; i++) {
+                               if( ! self.userLikedPost.includes(response.body.body.liked[i]) ) {
+                                 self.userLikedPost.push(response.body.body.liked[i]);
+                               }
+                             }
+
+                             //self.userSharedPost.push(response.shared);
+                           })
+                           .catch(function(error) {
+                             console.error('GET Post Actions Error: ' + error);
+                           });
                        })
                        .catch(function(error){
                           console.error('FB Connect Error: ' + error);
                        });
-
                    });
                   } else {
                    console.error('FB Connect Error: User cancelled login or did not fully authorize.');

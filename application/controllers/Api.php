@@ -23,41 +23,76 @@ class Api extends CI_Controller {
 		print_r( json_encode($response) );
 	}
 
+	private function update_action_record( $action = '', $method = '', $post_id = '' ) {
+		$record = $this->db->select($action . 's')
+													 ->where('id', $post_id)
+													 ->get('post')
+													 ->row($action . 's');
+
+		switch( $method ) {
+			case 0:
+				if( $record !== 0 ) {
+					$new_record = $record - 1;
+				}
+				break;
+			case 1:
+				$new_record = $record + 1;
+				break;
+		}
+
+		$this->db->where('id', $post_id)
+						 ->update('post', array($action . 's' => $new_record));
+	}
 	private function update_post_action( $action = '', $post_id = '', $fb_id = '') {
 
-		if( $action === 'like' ) {
-			$action_status = $this->get_action_status('like', $post_id, $fb_id);
+		if( $action == 'like' ) {
+			$is_exist_action = $this->db->where('post_id', $post_id)
+																	->where('fb_id', $fb_id)
+																	->get('post_action')
+																	->num_rows();
+			if( $is_exist_action > 0 ) {
+				$action_status = $this->get_action_status('like', $post_id, $fb_id);
 
-			if( empty($action_status) ) {
-					// No record. Create new record and return false.
-					$input = array(
-						'post_id'		=>	$post_id,
-						'fb_id'			=>	$fb_id,
-						'is_liked'	=>	1,
-					);
-					$this->db->insert('post_action', $input);
-			} else if( $action_status === 0) {
-				$input = array('is_liked' => 1);
+				if( $action_status == 0 ) {
 
-				$this->db->where('post_id', $post_id)
-								 ->where('fb_id', $fb_id)
-								 ->update('post_action', $input);
-			} else if( $action_status === 1 ) {
-				$input = array('is_liked' => 0);
+					$input = array('is_liked' => 1);
 
-				$this->db->where('post_id', $post_id)
-								 ->where('fb_id', $fb_id)
-								 ->update('post_action', $input);
+					$this->db->where('post_id', $post_id)
+									 ->where('fb_id', $fb_id)
+									 ->update('post_action', $input);
+
+					$this->update_action_record('like', 1, $post_id);
+
+				} else if( $action_status == 1 ) {
+					$input = array('is_liked' => 0);
+
+					$this->db->where('post_id', $post_id)
+									 ->where('fb_id', $fb_id)
+									 ->update('post_action', $input);
+
+					$this->update_action_record('like', 0, $post_id);
+				}
+
+			} else {
+				// No record. Create new record and return false.
+				$input = array(
+					'post_id'		=>	$post_id,
+					'fb_id'			=>	$fb_id,
+					'is_liked'	=>	1,
+				);
+				$this->db->insert('post_action', $input);
+
+				$this->update_action_record('like', 1, $post_id);
 			}
 
-		} else if( $action === 'comment' ) {
+		} else if( $action == 'comment' ) {
 			$comment_count = $this->get_action_count('comment', $post_id, $fb_id);
 			$input = array('comment_count' => $comment_count + 1);
 
 			$this->db->where('post_id', $post_id)
 							 ->where('fb_id', $fb_id)
 							 ->update('post_action', $input);
-		} else if( $action === 'share' ) {
+		} else if( $action == 'share' ) {
 			$share_count = $this->get_action_count('share', $post_id, $fb_id);
 			$input = array('$share_count' => $share_count + 1);
 
@@ -187,6 +222,58 @@ class Api extends CI_Controller {
 
 				print_r( json_encode($response) );
 			}
+
+		} else if( $method === 'GET' && $action === 'all' ) {
+		 	header("Access-Control-Allow-Methods: GET");
+
+		 	$error = false;
+		 	$fb_id = ! empty($this->uri->segment(5)) ? $this->uri->segment(5) : $error = true;
+
+		 	if( ! $error ) {
+		 		$liked = $this->db->select('post_id')
+		 													->where('fb_id', $fb_id)
+		 													->where('is_liked', 1)
+		 													->get('post_action')
+		 													->result_array();
+
+				$liked_posts = [];
+				foreach( $liked as $each ) {
+					$liked_posts[] = $each['post_id'];
+				}
+
+				$shared = $this->db->select('post_id')
+														->where('fb_id', $fb_id)
+														->where('is_shared', 1)
+														->get('post_action')
+														->result_array();
+
+				$shared_posts = [];
+				foreach( $shared as $each ) {
+					$shared_posts[] = $each['post_id'];
+				}
+
+				$body = array(
+					'liked'		=>	$liked_posts,
+					'shared'	=>	$shared_posts,
+				);
+
+				$response = array(
+					'status'	=> '200',
+					'code'		=> 'OK',
+					'message'	=>	'The resource has been fetched and is transmitted in the message body.',
+					'body'	=> $body,
+				);
+
+				print_r( json_encode($response) );
+		 	} else {
+				$response = array(
+					'status'	=> '400',
+					'code'		=> 'InvalidQueryParameterValue',
+					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+				);
+
+				print_r( json_encode($response) );
+		 	}
 
 		} else {
 			$response = array(
@@ -322,7 +409,7 @@ class Api extends CI_Controller {
 
 			$error = false;
 
-			if( $this->uri->segment(4) === 'hash' ){
+			if( $this->uri->segment(4) == 'hash' ){
 
 				$error = false;
 
@@ -361,7 +448,7 @@ class Api extends CI_Controller {
 					print_r( json_encode($output) );
 				}
 
-			} else if (	$this->uri->segment(4) === 'fb_connect' ) {
+			} else if (	$this->uri->segment(4) == 'fb_connect' ) {
 
 				$error = false;
 
@@ -406,7 +493,7 @@ class Api extends CI_Controller {
 
 			$error = false;
 
-			if( $this->uri->segment(4) === 'fb_connect' ){
+			if( $this->uri->segment(4) == 'fb_connect' ){
 
 				$error = false;
 
@@ -509,7 +596,7 @@ class Api extends CI_Controller {
 
 
 						// IP address pointed to single user.
-						if( count($uid_by_ip) === 1 ) {
+						if( count($uid_by_ip) == 1 ) {
 
 							$uid_by_ip = $uid_by_ip[0]['user_id'];
 							$uid_by_bfp = $uid_by_bfp[0]['user_id'];
@@ -540,7 +627,7 @@ class Api extends CI_Controller {
 
 							$is_identical = false;
 							foreach ( $uid_by_ip as $uid ) {
-								if( $uid['user_id'] === $uid_by_bfp ) {
+								if( $uid['user_id'] == $uid_by_bfp ) {
 									$is_identical = true;
 									break;
 								}
@@ -877,7 +964,7 @@ class Api extends CI_Controller {
 			);
 		}
 
-		if( $type === 'anonymous' ) {
+		if( $type == 'anonymous' ) {
 			$input = array(
 				'uuid'		=> $uuid,
 				'type'		=> 'anonymous',
@@ -913,7 +1000,7 @@ class Api extends CI_Controller {
 
 	private function link_user_with( $uid, $object, $table ) {
 
-		if( $table === 'ip_address' ) {
+		if( $table == 'ip_address' ) {
 			$input = array(
 				'user_id'	=>	$uid,
 				'ip_id'		=>	$object,
@@ -923,7 +1010,7 @@ class Api extends CI_Controller {
 
 			return $this->get_by('id', $uid, 'user');
 
-		} else if( $table === 'bfp_hash' ) {
+		} else if( $table == 'bfp_hash' ) {
 			$input = array(
 				'user_id'	=>	$uid,
 				'bfp_id'		=>	$object,
@@ -943,17 +1030,17 @@ class Api extends CI_Controller {
 			'last_visit' => date('Y-m-d H:i:s'),
 		);
 
-		if( $option === 'all' || $option === 'footprint' || $option === 'ip_address' ) {
+		if( $option == 'all' || $option == 'footprint' || $option == 'ip_address' ) {
 			$this->db->where('id', $values['ip_id'])
 							 ->update('ip_address', $input);
 		}
 
-		if( $option === 'all' || $option === 'footprint' || $option === 'bfp_hash' ) {
+		if( $option == 'all' || $option == 'footprint' || $option == 'bfp_hash' ) {
 			$this->db->where('id', $values['bfp_id'])
 							 ->update('bfp_hash', $input);
 		}
 
-		if( $option === 'all' || $option === 'user' ) {
+		if( $option == 'all' || $option == 'user' ) {
 
 			$last_visit = $this->get_by('id', $values['uid'], 'user')->last_visit;
 			$curr_date = date('Y-m-d');
@@ -968,7 +1055,7 @@ class Api extends CI_Controller {
 							 ->update('user', $input);
 		}
 
-		if( $option === 'fb' ) {
+		if( $option == 'fb' ) {
 
 			$last_visit = $this->get_by('fb_id', $values['fb_id'], 'user_fb')->last_visit;
 			$curr_date = date('Y-m-d');
