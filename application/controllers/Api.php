@@ -23,6 +23,23 @@ class Api extends CI_Controller {
 		print_r( json_encode($response) );
 	}
 
+	public function action( $method = '', $action = '' ) {
+
+		if( $method === 'POST' ) {
+
+			header("Access-Control-Allow-Methods: GET");
+
+		} else {
+			$response = array(
+				'status'	=> '400',
+				'code'		=> 'ConditionHeadersNotSupported',
+				'message'	=>	'Condition headers are not supported.',
+			);
+
+			print_r( json_encode($response) );
+		}
+	}
+
 	public function post( $method = '' ) {
 
 		if( $method === 'GET' ) {
@@ -157,6 +174,9 @@ class Api extends CI_Controller {
 
 					if( ! empty($bfp) ) {
 						$uid_by_bfp = $this->get_uid_by('bfp_hash', $bfp->id)[0]['user_id'];
+
+						$this->clear_post_count($uid_by_bfp);
+
 						$user = $this->get_by('id', $uid_by_bfp, 'user');
 					} else {
 						$user = [];
@@ -806,7 +826,20 @@ class Api extends CI_Controller {
 
 	}
 
-	private function update_post_count( $uid = '') {
+	//
+	private function clear_post_count( $uid = '' ) {
+		$curr_date = date('Y-m-d');
+		$last_post = $this->get_by('id', $uid, 'user')->last_post;
+
+		if( $last_post !== $curr_date ) {
+			$input['post_count'] = 0;
+			$this->db->where('id', $uid)
+							 ->update('user', $input);
+		}
+	}
+
+
+	private function update_post_count( $uid = '' ) {
 
 		$curr_date = date('Y-m-d');
 		$last_post = $this->get_by('id', $uid, 'user')->last_post;
@@ -822,6 +855,8 @@ class Api extends CI_Controller {
 		$this->db->where('id', $uid)
 						 ->update('user', $input);
 	}
+
+
 
 	// Delete.
 
