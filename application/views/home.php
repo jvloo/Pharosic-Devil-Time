@@ -100,7 +100,7 @@
                         <a href="#" v-show="false"><img class="ui mini image" src="http://ct.pharosic.com/assets/favicon-9ib6rx9h.png"></a>
                       </div>
                       <div class="item" v-show=" ! modalLoading" v-if="fbLoggedIn">
-                        <span>Hi, {{ fbUserName }}</span>
+                        <span>Hi, {{ fbData.name }}</span>
                         <span><a href="#" @click="fbLogOut" style="font-size: 20px; color: #1678C2"><i class="sign out alternate icon" alt="Log out my Facebook"></i></a></span>
                       </div>
                     </div>
@@ -143,7 +143,7 @@
                         </div>
                       </div>
                       <div class="action content">
-                        <a class="like" @click="fbLoggedIn ? ( userLikedPost.includes(post.id) ? ( userLikedPost.splice(userLikedPost.indexOf(post.id), 1), postUnliked(post) ) : ( userLikedPost.push(post.id), postLiked(post) ) ) : actionRequiredFb()">
+                        <a class="like" @click="fbLoggedIn ? postAction('like', post.id) : actionRequiredFb()">
                           <i :class="{'heart like icon': true, active: userLikedPost.includes(post.id) && fbLoggedIn }"></i>
                             {{ post.likes }}
                             <span v-if="post.likes <= 1">
@@ -308,7 +308,7 @@
             devilTokenCount: 0,
 
             fbLoggedIn: false,
-            fbUserName: '',
+            fbData: '',
 
           //----- Side Content -----//
             prevLoading: true,
@@ -432,13 +432,12 @@
 
                   FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone'}, function(response) {
 
-                    var fbData = response;
+                    self.fbData = response;
 
-                    self.$http.post('<?php echo site_url(); ?>/api/user/GET/fb_connect/' + fbData.id)
+                    self.$http.post('<?php echo site_url(); ?>/api/user/GET/fb_connect/' + self.fbData.id)
                       .then(function(response){
                         console.log('FB Connect: Succeed!');
                         self.fbLoggedIn = true;
-                        self.fbUserName = fbData.name;
                       })
                       .catch(function(error){
                          console.error('FB Connect Error: ' + error);
@@ -545,28 +544,27 @@
                   if (response.authResponse) {
                    FB.api('/me', {fields: 'id, email, cover, name, first_name, last_name, age_range, link, gender, locale, picture, timezone'}, function(response) {
 
-                     var fbData = response;
+                     self.fbData = response;
 
                      self.$http.post('<?php echo site_url(); ?>/api/user/POST/fb_connect/', {
                        user_id: self.user.id,
-                       fb_id: fbData.id,
-                       email: fbData.email,
-                       full_name: fbData.name,
-                       first_name: fbData.first_name,
-                       last_name: fbData.last_name,
-                       age: fbData.age_range.min,
-                       gender: fbData.gender,
-                       profile: fbData.link,
-                       profile_avatar: fbData.picture.data.url,
-                       profile_cover: fbData.cover.source,
-                       locale: fbData.locale,
-                       timezone: fbData.timezone
+                       fb_id: self.fbData.id,
+                       email: self.fbData.email,
+                       full_name: self.fbData.name,
+                       first_name: self.fbData.first_name,
+                       last_name: self.fbData.last_name,
+                       age: self.fbData.age_range.min,
+                       gender: self.fbData.gender,
+                       profile: self.fbData.link,
+                       profile_avatar: self.fbData.picture.data.url,
+                       profile_cover: self.fbData.cover.source,
+                       locale: self.fbData.locale,
+                       timezone: self.fbData.timezone
                      })
                        .then(function(response){
                          console.log('FB Connect: Succeed!');
-                         alert('Welcome back, ' + fbData.name + '!\n\nNote: Please log out Facebook before posting your new confession in order to stay anonymous.')
+                         alert('Welcome back, ' + self.fbData.name + '!\n\nNote: Please log out Facebook before posting your new confession in order to stay anonymous.')
                          self.fbLoggedIn = true;
-                         self.fbUserName = fbData.name;
                        })
                        .catch(function(error){
                           console.error('FB Connect Error: ' + error);
@@ -590,7 +588,7 @@
                 console.log('FB Connect: User logged out!');
                 alert('You have successfully logged out and diving among the anonymous devils.');
                 self.fbLoggedIn = false;
-                self.fbUserName = '';
+                self.fbData = '';
               });
             },
 
@@ -636,50 +634,57 @@
               alert('You need to connect with Facebook in order to perform the following action.');
             },
 
-            postLiked: function(element) {
-
-              if( this.fbLoggedIn) {
-
-                this.posts.forEach((e, i) => {
-                  if (e.id == element.id) {
-                    this.posts[i].likes = Number(this.posts[i].likes) + 1;
-                  }
-                });
-
-                self.$http.post('<?php echo site_url(); ?>/api/post/POST/action/like', {
-                  post_id: element.id,
-                  user_id: this.user.id,
-                })
-                  .then(function(response) {
-
+            postAction: function(action, postID) {
+              if( this.fbLoggedIn && action === 'like' ) {
+                if( this.userLikedPost.includes(postID) ) {
+                  // Communicate with server to record action.
+                  this.$http.post('<?php echo site_url(); ?>/api/action/POST/like', {
+                    post_id: postID,
+                    fb_id: this.fbData.id,
                   })
-                  .catch(function(error) {
+                    .then(function(response) {
+                      // Remove post id from liked list.
+                      this.userLikedPost.splice(this.userLikedPost.indexOf(postID), 1);
 
-                  });
-              }
-            },
+                      // Remove like.
+                      this.posts.forEach((each, i) => {
+                        if (each.id == postID) {
+                          this.posts[i].likes = Number(this.posts[i].likes) - 1;
+                        }
+                      });
+                    })
+                    .catch(function(error) {
+                      console.error('Post Unlike Error: ' + error);
+                    });
 
-            postUnliked: function(element) {
-              if( this.fbLoggedIn) {
+                } else {
 
-                this.posts.forEach((e, i) => {
-                  if (e.id == element.id) {
-                    this.posts[i].likes = Number(this.posts[i].likes) - 1;
-                  }
-                });
-
-                self.$http.post('<?php echo site_url(); ?>/api/post/POST/action/unlike', {
-                  post_id: element.id,
-                  user_id: this.user.id,
-                })
-                  .then(function(response) {
-
+                  // Communicate with server to record action.
+                  this.$http.post('<?php echo site_url(); ?>/api/action/POST/like', {
+                    post_id: postID,
+                    fb_id: this.fbData.id,
                   })
-                  .catch(function(error) {
+                    .then(function(response) {
+                      // Add post id into liked list.
+                      this.userLikedPost.push(postID);
 
-                  });
+                      // Add like.
+                      this.posts.forEach((each, i) => {
+                        if (each.id == postID) {
+                          this.posts[i].likes = Number(this.posts[i].likes) + 1;
+                        }
+                      });
+                    })
+                    .catch(function(error) {
+                      console.error('Post Like Error: ' + error);
+                    });
+                }
+
+              } else if( this.fbLoggedIn && action === 'comment' ) {
+
+              } else if( this.fbLoggedIn && action === 'share' ) {
+
               }
-
             },
 
           //----- Post Modal -----//

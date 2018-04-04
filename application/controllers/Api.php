@@ -33,42 +33,57 @@ class Api extends CI_Controller {
 					$input = array(
 						'post_id'		=>	$post_id,
 						'fb_id'			=>	$fb_id,
+						'is_liked'	=>	1,
 					);
 					$this->db->insert('post_action', $input);
 			} else if( $action_status === 0) {
 				$input = array('is_liked' => 1);
+
+				$this->db->where('post_id', $post_id)
+								 ->where('fb_id', $fb_id)
+								 ->update('post_action', $input);
 			} else if( $action_status === 1 ) {
 				$input = array('is_liked' => 0);
+
+				$this->db->where('post_id', $post_id)
+								 ->where('fb_id', $fb_id)
+								 ->update('post_action', $input);
 			}
 
 		} else if( $action === 'comment' ) {
 			$comment_count = $this->get_action_count('comment', $post_id, $fb_id);
 			$input = array('comment_count' => $comment_count + 1);
+
+			$this->db->where('post_id', $post_id)
+							 ->where('fb_id', $fb_id)
+							 ->update('post_action', $input);
 		} else if( $action === 'share' ) {
 			$share_count = $this->get_action_count('share', $post_id, $fb_id);
 			$input = array('$share_count' => $share_count + 1);
+
+			$this->db->where('post_id', $post_id)
+							 ->where('fb_id', $fb_id)
+							 ->update('post_action', $input);
 		}
-		$this->db->where('post_id', $post_id)
-						 ->where('fb_id', $fb_id)
-						 ->update('post_action', $input);
+
 	}
 
 	private function get_action_status( $action = '', $post_id = '', $fb_id = '' ) {
-		$result = $this->select('is_'$action . 'd')
-									 ->where('post_id', $post_id)
-									 ->where('fb_id', $fb_id)
-									 ->get('post_action')
-									 ->row('is_'$action . 'd');
+		$result = $this->db->select('is_' . $action . 'd')
+									 		 ->where('post_id', $post_id)
+									 	   ->where('fb_id', $fb_id)
+									 	 	 ->get('post_action')
+									 	 	 ->row('is_' . $action . 'd');
 
 		return $result;
 	}
 	private function get_action_count( $action = '', $post_id = '', $fb_id = '' ) {
 
-		$result = $this->select($action . '_count')
-									 ->where('post_id', $post_id)
-									 ->where('fb_id', $fb_id)
-									 ->get('post_action')
-									 ->row($action . '_count');
+		$result = $this->db->select($action . '_count')
+									 	 ->where('post_id', $post_id)
+									 	 ->where('fb_id', $fb_id)
+									 	 ->get('post_action')
+									 	 ->row($action . '_count');
 
 		return $result;
 	}
