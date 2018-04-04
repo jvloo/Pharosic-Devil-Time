@@ -23,12 +23,112 @@ class Api extends CI_Controller {
 		print_r( json_encode($response) );
 	}
 
+	private function update_post_action( $action = '', $post_id = '', $fb_id = '') {
+
+		if( $action === 'like' ) {
+			$action_status = $this->get_action_status('like', $post_id, $fb_id);
+
+			if( $action_status === 0) {
+				$input = array('is_liked' => 1);
+			} else if( $action_status === 1 ) {
+				$input = array('is_liked' => 0);
+			}
+
+		} else if( $action === 'comment' ) {
+			$comment_count = $this->get_action_count('comment', $post_id, $fb_id);
+
+			$input = array('comment_count' => $comment_count + 1);
+
+
+		} else if( $action === 'share' ) {
+			$share_count = $this->get_action_count('share', $post_id, $fb_id);
+
+		}
+		$this->db->where('post_id', $post_id)
+						 ->where('fb_id', $fb_id)
+						 ->update('post_action', $input);
+	}
+
+	private function get_action_status( $action = '', $post_id = '', $fb_id = '' ) {
+		$result = $this->select('is_'$action . 'd')
+									 ->where('post_id', $post_id)
+									 ->where('fb_id', $fb_id)
+									 ->get('post_action')
+									 ->row('is_'$action . 'd');
+
+		return $result;
+	}
+	private function get_action_count( $action = '', $post_id = '', $fb_id = '' ) {
+
+		$result = $this->select($action . '_count')
+									 ->where('post_id', $post_id)
+									 ->where('fb_id', $fb_id)
+									 ->get('post_action')
+									 ->row($action . '_count');
+
+		return $result;
+	}
+
+	private function is_post_liked( $post_id = '', $fb_id = '' ) {
+		$result = $this->db->select('is_liked')
+											 ->where('post_id', $post_id)
+											 ->where('fb_id', $fb_id)
+											 ->get('post_action')
+											 ->row('is_liked');
+
+		if( empty($result) ) {
+
+			// No record. Create new record and return false.
+			$input = array(
+				'post_id'		=>	$post_id,
+				'fb_id'			=>	$fb_id,
+			);
+
+			$this->db->insert('post_action', $input);
+			return false;
+		} else if( $result === 0 ) {
+			return false;
+		} else if( $result === 1 ) {
+			return true;
+		}
+	}
+
 	public function action( $method = '', $action = '' ) {
 
 		if( $method === 'POST' ) {
 
 			header("Access-Control-Allow-Methods: GET");
 
+			if( $action = 'like' ) {
+
+				$error = false;
+
+				$post_id = ! empty( $this->input->post('post_id') ) ? $this->input->post('post_id') : $error = true;
+				$fb_id = ! empty( $this->input->post('fb_id') ) ? $this->input->post('fb_id') : $error = true;
+
+				$is_post_liked = $this->is_post_liked($post_id, $fb_id);
+
+				if( ! $error ) {
+
+					if( $is_post_liked === true ) {
+						// Update record.
+
+					} else if( $is_post_liked === false ) {
+						// Update record.
+
+					}
+				} else {
+					// NOTE Error
+				}
+
+
+			} else if( $action = 'comment' ) {
+
+			} else if( $action = 'share' ) {
+
+			} else {
+				// NOTE ERROR
+			}
 		} else {
 			$response = array(
 				'status'	=> '400',
