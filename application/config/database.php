@@ -97,10 +97,10 @@ $db['development'] = array(
 
 $db['production'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => '',
-	'password' => '',
-	'database' => '',
+	'hostname' => 'sql312.epizy.com',
+	'username' => 'epiz_21818366',
+	'password' => 'xavier130#if',
+	'database' => 'epiz_21818366_pharosic_dt',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

@@ -164,56 +164,47 @@
                               comments
                             </span>
                           </a>
-                          <a class="share">
-                            <i class="share icon"></i>
-                            {{ post.shares }}
-                            <span v-if="post.shares <= 1">
-                              share
-                            </span>
-                            <span v-else>
-                              shares
-                            </span>
-                          </a>
                         </span>
                       </div>
 
                       <div class="extra content">
-                        <div class="ui comments">
-                          <a>View all comments</a>
-                          <div class="comment">
+                        <div class="ui comments" v-if="postComments[post.id].length > 0">
+                          <a @click="loadComment(post.id)">View more comments</a>
+
+                          <div class="comment" v-for="comment in postComments[post.id]">
                             <a class="avatar">
-                              <img src="https://image.flaticon.com/icons/svg/141/141747.svg">
+                              <img :src="comment.author_avatar">
                             </a>
                             <div class="content">
-                              <a class="author">Matt</a>
+                              <a class="author">{{ comment.author_name }}</a>
                               <div class="metadata">
                                 <span class="date">
-                                  <time datetime="2018-03-23T09:24:17Z">March 23, 2018</time>
+                                  <time>{{ timeAgo(comment.created_on) }}</time>
                                 </span>
                               </div>
                               <div class="text">
-                                How artistic!
+                                {{ comment.description }}
                               </div>
                               <div class="actions">
-                                <a class="like">
-                                  <i class="heart like icon"></i>
-                                   17 likes
-                                </a>
-                                <a class="reply">Reply</a>
                               </div>
                             </div>
                           </div>
+
+                          <div class="loader" v-show="loadingMoreComment">
+                            <beat-loader :loading="loadingMoreComment" color="#1678C2" size="10px" margin="2px" radius="100%" style="padding: 5px 0px;"></beat-loader>
+                          </div>
+
                         </div>
                       </div>
                       <div class="extra content">
                         <div class="ui large transparent right icon fluid input">
-                          <input type="text" placeholder="Add Comment...">
-                          <i class="reply icon"></i>
+                          <input type="text" placeholder="Add Comment..." v-model="c_description[post.id]">
+                          <a @click="fbLoggedIn ? commentSubmit(post.id) : actionRequiredFb()"><i class="reply icon"></i></a>
                         </div>
                       </div>
                     </article>
-                    <div class="loader" v-show="loadingMore">
-                      <beat-loader :loading="loadingMore" color="#1678C2" size="15px" margin="2px" radius="100%" style="padding: 15px 0px;"></beat-loader>
+                    <div class="loader" v-show="loadingMorePost">
+                      <beat-loader :loading="loadingMorePost" color="#1678C2" size="15px" margin="2px" radius="100%" style="padding: 15px 0px;"></beat-loader>
                       Loading...
                     </div>
                   </div>
@@ -335,9 +326,20 @@
             totalEntries: 0,
 
             loadPostOffset: 0,
-            loadingMore: true,
+            loadPostLimit: 20,
+            loadingMorePost: true,
+
+            loadCommentOffset: 0,
+            loadCommentLimit: 3,
+            totalComments: [],
+            postComments: [],
+            loadingMoreComment: false,
+            commentLeftOver: 0,
 
             userLikedPost: [],
+            userSharedPost: [],
+
+            c_description: [],
 
           //----- Post Modal -----//
             postModal: false,
@@ -550,6 +552,93 @@
               });
         },
         methods: {
+
+            commentSubmit: function (postID) {
+
+              if( ! this.c_description[postID] || this.c_description[postID] === '') {
+                alert('Please enter your comment.');
+              } else {
+                this.$http.post('<?php echo site_url(); ?>/api/comment/POST/', {
+                  author_id: this.fbData.id,
+                  author_name: this.fbData.name,
+                  author_avatar: this.fbData.picture.data.url,
+                  description: this.c_description[postID],
+                  post_id: postID,
+                })
+                  .then(function(response){
+                    alert('Your comment on post #' + postID +' has been posted.')
+                    console.log('Post Submit: Succeed!');
+                    this.c_description[postID] = '';
+                    console.log(this.postComments[postID]);
+
+                    this.postAction('comment', postID);
+                    this.loadComment(postID);
+
+                    /* var newComment = '{id: "0", author_id: ' + this.fbData.id + ', author_name: ' + this.fbData.name + ', author_avatar: ' + this.fbData.picture.data.url + ', description: ' + this.c_description[postID] + '}';
+
+                    if( ! this.postComments[postID] || this.postComments[postID] === '' ) {
+                      this.postComments[postID] = [];
+                    }
+
+                    this.postComments[postID].push(newComment); */
+                  })
+                  .catch(function(error){
+                      alert('Comment Submit: Unexpected error occurred. Please send feedback to admin.')
+                      console.error('Comment Submit Error: ' + error);
+                  });
+              }
+
+            },
+
+            loadComment: function (postID) {
+
+              this.loadingMoreComment = true;
+
+              if( ! this.totalComments[postID] || this.totalComments[postID] === '' ) {
+                var leftOver = 0;
+              } else {
+                var leftOver = this.totalComments[postID] - this.loadCommentOffset;
+              }
+
+              if( leftOver === 0) {
+                this.loadingMoreComment = false;
+                this.loadCommentOffset = this.loadCommentOffset + leftOver;
+              } else if ( leftOver <= this.loadCommentLimit ) {
+                this.loadCommentOffset = this.loadCommentOffset + leftOver;
+                this.loadingMoreComment = true;
+                // BUG: duplicate posts when loading more posts after new post submitted.
+              } else if( leftOver > this.loadCommentLimit ) {
+                this.loadCommentOffset = this.loadCommentOffset + this.loadCommentLimit;
+                this.loadingMoreComment = true;
+              }
+
+              var getComments = axios.get('<?php echo site_url(); ?>/api/comment/GET/' + postID + '/limit/' + this.loadCommentLimit + '/offset/' + this.loadCommentOffset)
+                .then( (result) => {
+                  console.log('GET Comments: Succeed!');
+
+                  if( ! this.postComments[postID] ) {
+                    this.postComments[postID] = [];
+                  }
+
+                  for (var i = 0, len = result.data.body.length; i < len; i++) {
+                    this.postComments[postID].push(result.data.body[i]);
+                  }
+
+                  if(this.postComments[postID].length === 0) {
+                    //this.postNoContent = true;
+                  } else {
+                    //this.postNoContent = false;
+                  }
+
+                  this.totalComments[postID] = result.data.total_comments;
+                  this.loadingMoreComment = false;
+                })
+                .catch( (error) => {
+                  console.error('GET Comments Error: ' + error);
+                });
+
+            },
+
           //----- FB Connect -----//
             fbLogIn: function () {
 
@@ -711,7 +800,11 @@
                 }
 
               } else if( this.fbLoggedIn && action === 'comment' ) {
-
+                this.posts.forEach((each, i) => {
+                  if (each.id == postID) {
+                    this.posts[i].comments = Number(this.posts[i].comments) + 1;
+                  }
+                });
               } else if( this.fbLoggedIn && action === 'share' ) {
 
               }
@@ -798,30 +891,33 @@
                 $state.loaded();
               }, 1000);
             },
+
             loadPost: function () {
 
-              this.loadingMore = false;
+              this.loadingMorePost = false;
 
               var leftOver = this.totalEntries - this.loadPostOffset;
 
               if( leftOver === 0) {
-                this.loadingMore = false;
+                this.loadingMorePost = false;
                 this.loadPostOffset = this.loadPostOffset + leftOver;
-              } else if ( leftOver <= 20 ) {
+              } else if ( leftOver <= this.loadPostLimit ) {
                 this.loadPostOffset = this.loadPostOffset + leftOver;
-                this.loadingMore = true;
+                this.loadingMorePost = true;
                 // BUG: duplicate posts when loading more posts after new post submitted.
-              } else if( leftOver > 20 ) {
-                this.loadPostOffset = this.loadPostOffset + 20;
-                this.loadingMore = true;
+              } else if( leftOver > this.loadPostLimit ) {
+                this.loadPostOffset = this.loadPostOffset + this.loadPostLimit;
+                this.loadingMorePost = true;
               }
 
-              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/20/offset/' + this.loadPostOffset)
+              var getPosts = axios.get('<?php echo site_url(); ?>/api/post/GET/limit/' + this.loadPostLimit + '/offset/' + this.loadPostOffset)
                 .then( (result) => {
                   console.log('GET Posts: Succeed!');
 
                   for (var i = 0, len = result.data.body.length; i < len; i++) {
                     this.posts.push(result.data.body[i]);
+
+                    this.loadComment(result.data.body[i].id);
                   }
 
                   if(this.posts.length === 0) {

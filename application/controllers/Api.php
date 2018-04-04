@@ -23,6 +23,84 @@ class Api extends CI_Controller {
 		print_r( json_encode($response) );
 	}
 
+	public function comment( $method = '' ) {
+		if( $method === 'POST' ) {
+
+			header("Access-Control-Allow-Methods: POST");
+
+			$error = false;
+
+			$author_id = ! empty( $this->input->post('author_id') ) ? $this->input->post('author_id') : $error = true;
+			$author_name = ! empty( $this->input->post('author_name') ) ? $this->input->post('author_name') : $error = true;
+			$author_avatar = ! empty( $this->input->post('author_avatar') ) ? $this->input->post('author_avatar') : $error = true;
+			$description = ! empty( $this->input->post('description') ) ? $this->input->post('description') : $error = true;
+			$post_id = ! empty( $this->input->post('post_id') ) ? $this->input->post('post_id') : $error = true;
+
+			if( ! $error ) {
+
+				$input = array(
+					'author_id'				=> 	$author_id,
+					'author_name'			=> 	$author_name,
+					'author_avatar'		=> 	$author_avatar,
+					'description'			=> 	$description,
+					'post_id'					=> 	$post_id,
+					'created_on'			=>	date('Y-m-d H:i:s'),
+				);
+
+				$this->db->insert('post_comment', $input);
+
+				$this->update_action_record('comment', 1, $post_id);
+			} else {
+
+
+			}
+
+		} else if( $method === 'GET' ) {
+
+			header("Access-Control-Allow-Methods: GET");
+
+			//		GET specific post.
+			//		/GET/id/ ${pid}
+			if( ! empty($this->uri->segment(4)) ) {
+
+				$post_id = $this->uri->segment(4);
+
+				$table = 'post_comment';
+				$query = 'SELECT * FROM ' . $table . ' WHERE post_id = ' . $post_id . ' ORDER BY id DESC';
+
+				if( ! empty($this->uri->segment(6)) ) {
+					$limit = $this->uri->segment(6);
+					$query = $query . ' LIMIT ' . $limit;
+				}
+
+				if( ! empty($this->uri->segment(8)) ) {
+					$offset = $this->uri->segment(8);
+					$query = $query . ' OFFSET ' . $offset;
+				}
+
+				$result = $this->db->query($query)->result_array();
+
+
+				$response = array(
+					'status'	=> '200',
+					'code'		=> 'OK',
+					'message'	=>	'The resource has been fetched and is transmitted in the message body.',
+					'body'	=> $result,
+				);
+
+				$response['total_comments'] = $this->db->count_all('post_comment');
+
+
+				print_r( json_encode($response) );
+
+				// TODO: post_count && last_post
+			}
+		} else {
+
+
+
+		}
+	}
 	private function update_action_record( $action = '', $method = '', $post_id = '' ) {
 		$record = $this->db->select($action . 's')
 													 ->where('id', $post_id)
