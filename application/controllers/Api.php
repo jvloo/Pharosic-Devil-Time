@@ -28,7 +28,14 @@ class Api extends CI_Controller {
 		if( $action === 'like' ) {
 			$action_status = $this->get_action_status('like', $post_id, $fb_id);
 
-			if( $action_status === 0) {
+			if( empty($action_status) ) {
+					// No record. Create new record and return false.
+					$input = array(
+						'post_id'		=>	$post_id,
+						'fb_id'			=>	$fb_id,
+					);
+					$this->db->insert('post_action', $input);
+			} else if( $action_status === 0) {
 				$input = array('is_liked' => 1);
 			} else if( $action_status === 1 ) {
 				$input = array('is_liked' => 0);
@@ -36,13 +43,10 @@ class Api extends CI_Controller {
 
 		} else if( $action === 'comment' ) {
 			$comment_count = $this->get_action_count('comment', $post_id, $fb_id);
-
 			$input = array('comment_count' => $comment_count + 1);
-
-
 		} else if( $action === 'share' ) {
 			$share_count = $this->get_action_count('share', $post_id, $fb_id);
-
+			$input = array('$share_count' => $share_count + 1);
 		}
 		$this->db->where('post_id', $post_id)
 						 ->where('fb_id', $fb_id)
@@ -69,66 +73,106 @@ class Api extends CI_Controller {
 		return $result;
 	}
 
-	private function is_post_liked( $post_id = '', $fb_id = '' ) {
-		$result = $this->db->select('is_liked')
-											 ->where('post_id', $post_id)
-											 ->where('fb_id', $fb_id)
-											 ->get('post_action')
-											 ->row('is_liked');
-
-		if( empty($result) ) {
-
-			// No record. Create new record and return false.
-			$input = array(
-				'post_id'		=>	$post_id,
-				'fb_id'			=>	$fb_id,
-			);
-
-			$this->db->insert('post_action', $input);
-			return false;
-		} else if( $result === 0 ) {
-			return false;
-		} else if( $result === 1 ) {
-			return true;
-		}
-	}
-
 	public function action( $method = '', $action = '' ) {
 
 		if( $method === 'POST' ) {
 
-			header("Access-Control-Allow-Methods: GET");
+			header("Access-Control-Allow-Methods: POST");
 
-			if( $action = 'like' ) {
+			$error = false;
 
-				$error = false;
+			$post_id = ! empty( $this->input->post('post_id') ) ? $this->input->post('post_id') : $error = true;
+			$fb_id = ! empty( $this->input->post('fb_id') ) ? $this->input->post('fb_id') : $error = true;
 
-				$post_id = ! empty( $this->input->post('post_id') ) ? $this->input->post('post_id') : $error = true;
-				$fb_id = ! empty( $this->input->post('fb_id') ) ? $this->input->post('fb_id') : $error = true;
+			if( ! $error ) {
+				switch( $action ) {
+					case 'like':
+						$this->update_post_action('like', $post_id, $fb_id);
 
-				$is_post_liked = $this->is_post_liked($post_id, $fb_id);
+						if( $this->db->affected_rows() > 0 ) {
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> '',
+							);
+							print_r( json_encode($response) );
+						}
+						break;
+					case 'comment':
+						$error = false;
 
-				if( ! $error ) {
+						$author_name = ! empty( $this->input->post('author_name') ) ? $this->input->post('author_name') : $error = true;
+						$author_avatar = ! empty( $this->input->post('author_avatar') ) ? $this->input->post('author_avatar') : $error = true;
+						$description = ! empty( $this->input->post('description') ) ? $this->input->post('description') : $error = true;
 
-					if( $is_post_liked === true ) {
-						// Update record.
+						if( ! $error ) {
+							$input = array(
+								'author_id'		=>	$fb_id,
+								'author_name'	=>	$author_name,
+								'author_avatar'	=>	$author_avatar,
+								'description'	=>	$description,
+								'post_id'			=>	$post_id,
+								'created_on'	=> date('Y-m-d H:i:s'),
+							);
 
-					} else if( $is_post_liked === false ) {
-						// Update record.
+							$this->db->insert('post_comment', $input);
 
-					}
-				} else {
-					// NOTE Error
+							if( $this->db->affected_rows() > 0 ) {
+								$this->update_post_action('comment', $post_id, $fb_id);
+
+								$response = array(
+									'status'	=> '200',
+									'code'		=> 'OK',
+									'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+									'body'	=> '',
+								);
+								print_r( json_encode($response) );
+							}
+						} else {
+							$response = array(
+								'status'	=> '400',
+								'code'		=> 'InvalidQueryParameterValue',
+								'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+							);
+							print_r( json_encode($response) );
+						}
+
+						break;
+					case 'share':
+						$this->update_post_action('share', $post_id, $fb_id);
+
+						if( $this->db->affected_rows() > 0 ) {
+							$response = array(
+								'status'	=> '200',
+								'code'		=> 'OK',
+								'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
+								'body'	=> '',
+							);
+							print_r( json_encode($response) );
+						}
+						break;
+					default:
+						$response = array(
+							'status'	=> '400',
+							'code'		=> 'InvalidQueryParameterValue',
+							'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+						);
+
+						print_r( json_encode($response) );
+						break;
 				}
 
-
-			} else if( $action = 'comment' ) {
-
-			} else if( $action = 'share' ) {
-
 			} else {
-				// NOTE ERROR
+				$response = array(
+					'status'	=> '400',
+					'code'		=> 'InvalidQueryParameterValue',
+					'message'	=>	'An invalid value was specified for one of the query parameters in the request URI.',
+				);
+
+				print_r( json_encode($response) );
 			}
+
 		} else {
 			$response = array(
 				'status'	=> '400',
@@ -226,7 +270,7 @@ class Api extends CI_Controller {
 					'status'	=> '200',
 					'code'		=> 'OK',
 					'message'	=>	'The resource describing the result of the action is transmitted in the message body.',
-					'body'	=> $this->db->affected_rows(),
+					'body'	=> '',
 				);
 
 				$this->update_post_count($user_id);
