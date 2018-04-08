@@ -378,6 +378,20 @@ class Api extends CI_Controller {
 
 			//		GET all post.
 			//		/GET/limit/ ${limit} /offset/ ${offset}
+			}	else if( $this->uri->segment(4) === 'total') {
+
+				$result['total_post'] = $this->db->count_all('post');
+
+				$response = array(
+					'status'	=> '200',
+					'code'		=> 'OK',
+					'message'	=>	'The resource has been fetched and is transmitted in the message body.',
+					'body'	=> $result,
+				);
+
+
+
+				print_r( json_encode($response) );
 			} else {
 
 				$table = 'post';
@@ -402,9 +416,6 @@ class Api extends CI_Controller {
 					'message'	=>	'The resource has been fetched and is transmitted in the message body.',
 					'body'	=> $result,
 				);
-
-				$response['total_entries'] = $this->db->count_all('post');
-
 
 				print_r( json_encode($response) );
 
